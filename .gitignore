@@ -1,1 +1,86 @@
-venv
+# DJANGO #
+*.log
+*.pot
+*.pyc
+__pycache__
+# db.sqlite3
+media
+
+# BACKUP FILES #
+*.bak
+
+# PYTHON #
+*.py[COD]
+*$py.class
+
+# DIST / PACKAGING#
+.Python build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+
+# INSTALLER LOGS #
+pip-log.txt
+pip-delete-this-directory.txt
+
+# UNIT TEST / COVERAGE REPORTS#
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hipothesis/
+
+.ipynb_checkpoints
+
+#pyenv#
+.python-version
+
+#celerity
+celerybeat-schedule.*
+
+#sagemath
+*.sage.py
+
+#enviroments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+#mkdocs
+/site
+
+#pypy
+.mypy_chache/
+
+#sftp config
+sftp-config.json
+
+# vscode #
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extentions.json
+.history

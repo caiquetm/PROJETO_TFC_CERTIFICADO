@@ -1,10 +1,11 @@
 from django.urls import path
-from app_certificado.views import home, aluno, usuario, certificado, template
+
+from . import views
 
 urlpatterns = [
-    path('', home),
-    path('', aluno),
-    path('', usuario),
-    path('', certificado),
-    path('', template),
+    path('', views.home),
+    path('', views.aluno),
+    path('', views.usuario),
+    path('certificados/<int:id>/', views.certificado),
+    path('', views.template),
 ]

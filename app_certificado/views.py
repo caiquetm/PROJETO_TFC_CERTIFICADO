@@ -11,7 +11,7 @@ def usuario(request):
     return render(request, 'app_certificado/usuario.html')
 
 def certificado(request, id):
-    return render(request, 'app_certificado/pages/certificado.html', context={'name': 'Caique'})
+    return render(request, 'app_certificado/pages/certificado-view.html', context={'name': 'Caique'})
 
 def template(request):
     return render(request, 'app_certificado/template.html')

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+{% include 'app_certificado/partials/head.html' %}
+
+
+<title> {% block title %}{% endblock title %} Certificado</title>
+
+</head>
+<body>
+  {% include 'app_certificado/partials/header.html' %}
+
+  {% include 'app_certificado/partials/search.html' %}
+
+  <main class="main-content-container">
+    {% block content %}{% endblock content %}
+  </main>
+
+  {% include "app_certificado/partials/footer.html" %}
+</body>
+</html>

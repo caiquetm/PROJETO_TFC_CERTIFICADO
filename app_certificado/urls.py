@@ -9,3 +9,4 @@ urlpatterns = [
     path('certificados/<int:id>/', views.certificado),
     path('', views.template),
 ]
+

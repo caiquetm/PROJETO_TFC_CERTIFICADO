@@ -1,21 +1,16 @@
-{% include 'app_certificado/partials/head.html' %}
+{% extends "global/base.html" %}
 
-<body>
-  {% include 'app_certificado/partials/header.html' %}
+{% block title %}Home{% endblock %}
 
-  {% include 'app_certificado/partials/search.html' %}
+{% block content %}
 
-  <main class="main-content-container">
-    <div class="main-content main-content-list container">
-      {% include 'app_certificado/partials/certificado.html' %}
-      {% include 'app_certificado/partials/certificado.html' %}
-      {% include 'app_certificado/partials/certificado.html' %}
-      {% include 'app_certificado/partials/certificado.html' %}
-      {% include 'app_certificado/partials/certificado.html' %}
-      {% include 'app_certificado/partials/certificado.html' %}
-    </div>
-  </main>
+<div class="main-content main-content-list container">
+  {% include 'app_certificado/partials/certificado.html' %}
+  {% include 'app_certificado/partials/certificado.html' %}
+  {% include 'app_certificado/partials/certificado.html' %}
+  {% include 'app_certificado/partials/certificado.html' %}
+  {% include 'app_certificado/partials/certificado.html' %}
+  {% include 'app_certificado/partials/certificado.html' %}
+</div>
 
-  {% include "app_certificado/partials/footer.html" %}
-</body>
-</html>
+{% endblock content %}

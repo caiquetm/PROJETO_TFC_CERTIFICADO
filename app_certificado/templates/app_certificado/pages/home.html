@@ -1,16 +1,13 @@
 {% extends "global/base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Home{% endblock title %}
 
 {% block content %}
 
 <div class="main-content main-content-list container">
-  {% include 'app_certificado/partials/certificado.html' %}
-  {% include 'app_certificado/partials/certificado.html' %}
-  {% include 'app_certificado/partials/certificado.html' %}
-  {% include 'app_certificado/partials/certificado.html' %}
-  {% include 'app_certificado/partials/certificado.html' %}
-  {% include 'app_certificado/partials/certificado.html' %}
+  {% for certificado in certificados %}
+    {% include 'app_certificado/partials/certificado.html' %}
+  {% endfor %}
 </div>
 
 {% endblock content %}

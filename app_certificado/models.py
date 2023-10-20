@@ -36,8 +36,10 @@ class Certificado(models.Model):
     Categoria = models.CharField(max_length=65)
     Status = models.BooleanField(default=False)
     Imagem = models.ImageField(upload_to='certificados/covers/%Y/%m/%d')
-    Aluno = models.ForeignKey(Aluno, on_delete=models.SET_NULL, null=True)
-    Templates = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True)
+    Aluno = models.ForeignKey(
+        Aluno, on_delete=models.SET_NULL, null=True)
+    Templates = models.ForeignKey(
+        Template, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.Nome

@@ -4,42 +4,42 @@ from django.db import models
 
 
 class Usuario(models.Model):
-    Email = models.CharField(max_length=50)
-    Nome = models.CharField(max_length=50)
-    Senha = models.CharField(max_length=65)
-    Adm = models.BooleanField(default=False)
+    email = models.CharField(max_length=50)
+    nome = models.CharField(max_length=50)
+    senha = models.CharField(max_length=65)
+    adm = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.Nome
+        return self.nome
 
 
 class Aluno(models.Model):
-    Nome = models.CharField(max_length=50)
-    Horas = models.IntegerField()
+    nome = models.CharField(max_length=50)
+    horas = models.IntegerField()
 
     def __str__(self):
-        return self.Nome
+        return self.nome
     
 
 class Template(models.Model):
-    Instituicao = models.CharField(max_length=65)
-    Imagem = models.ImageField(upload_to='TemplatesCertificado/covers/%Y/%m/%d')
+    instituicao = models.CharField(max_length=65)
+    imagem = models.ImageField(upload_to='TemplatesCertificado/covers/%Y/%m/%d')
 
     def __str__(self):
-        return self.Instituicao
+        return self.instituicao
 
 
 class Certificado(models.Model):
-    Nome = models.CharField(max_length=65)
-    Instituicao = models.CharField(max_length=65)
-    Duracao = models.CharField(max_length=65)
-    Categoria = models.CharField(max_length=65)
-    Status = models.BooleanField(default=False)
-    Imagem = models.ImageField(upload_to='certificados/covers/%Y/%m/%d')
-    Aluno = models.ForeignKey(
+    nome = models.CharField(max_length=65)
+    instituicao = models.CharField(max_length=65)
+    duracao = models.CharField(max_length=65)
+    categoria = models.CharField(max_length=65)
+    status = models.BooleanField(default=False)
+    imagem = models.ImageField(upload_to='certificados/covers/%Y/%m/%d')
+    aluno = models.ForeignKey(
         Aluno, on_delete=models.SET_NULL, null=True)
-    Templates = models.ForeignKey(
+    template = models.ForeignKey(
         Template, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.Nome
+        return self.nome

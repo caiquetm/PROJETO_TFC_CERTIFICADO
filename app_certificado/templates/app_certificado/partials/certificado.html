@@ -1,22 +1,47 @@
 <div class="certificado certificados-list-item">
-
     <div class="certificado-cover">
-      
+      <a href="{% url 'app_certificado:certificado' certificado.id %}">
+        <img src="{{ certificado.imagem.url }}" alt="Temporário">
+      </a>
     </div>
 
     <div class="certificado-title-container">
-      <h2 class="certificado-title">{{ certificado.instituicao }}</h2>
+      <h2 class="certificado-title">
+        <a href="{% url 'app_certificado:certificado' certificado.id %}">
+          {{ certificado.instituicao }}</h2>
+        </a>
     </div>
+
+    <div class="certificado-aluno">
+      <i class="fas fa-user">
+        {{ certificado.aluno }}
+      </i>
+    </div>
+    
+    <div>
+      <span class="certificado-aluno-item">
+        <a href="{% url 'app_certificado:aluno' certificado.aluno.id %}">
+          <i class="fas fa-layer-group"></i>
+          <span>{{ certificado.aluno}}</span>
+        </a>
+      </span>
+    </div>
+
 
     <div class="certificado-content">
-      <p>{{ certificado.descricao }}</p>
+      <p>{{ certificado.categoria }}</p>
     </div>
+  
+    {% if is_detail_page is not True %}
+      <footer class="certificado-footer">
+        <a class="certificado-read-more button button-dark button-full-width" href=" {% url 'app_certificado:certificado' certificado.id %}">
+            <i class="fas fa-eye"></i>
+            <span>ver mais...</span>
+        </a>
+      </footer>
+    {% endif %}
 
-    <footer class="certificado-footer">
-      <a class="certificado-read-more button button-dark button-full-width" href="/certificados/3/">
-          <i class="fas fa-eye"></i>
-          <span>ver mais...</span>
-      </a>
-  </footer>
+    {% if is_detail_page is True %}
+    {% endif %}
 
   </div>

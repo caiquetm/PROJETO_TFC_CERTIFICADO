@@ -227,3 +227,129 @@ h6 {
     box-shadow: -5px 5px 15px rgba(0, 0, 0, .2);
 }
 
+/* Estilo para o título */
+h1 {
+    font-size: 24px;
+    color: #333;
+    text-align: center; /* Centralizar o título */
+    margin-bottom: 20px;
+}
+
+/* Estilo para a lista de templates */
+ul {
+    list-style: none;
+    padding: 0;
+    text-align: center; /* Centralizar a lista */
+}
+
+li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centralizar o conteúdo da lista */
+}
+
+/* Estilo para os links de editar e inativar */
+a {
+    text-decoration: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+    display: inline-block;
+    margin: 10px;
+}
+
+/* Estilo para o link "Adicionar Novo Template" */
+a.add-link {
+    display: block;
+    width: 200px;
+    margin: 0 auto; /* Centralizar horizontalmente */
+    text-align: center; /* Centralizar o texto */
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* Estilo para o link "Voltar para a Lista de Templates" */
+a.back-link {
+    display: block;
+    text-align: center; /* Centralizar o texto */
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* Estilo para os links de botões */
+a.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    margin: 10px;
+}
+
+/* Estilo para o link de "Editar Template" */
+a.edit-link {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Estilo para o link de "Inativar Template" */
+a.inactivate-link {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+form {
+    max-width: 400px;
+    margin: 0 auto; /* Centralizar o formulário horizontalmente */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para o botão "Salvar" */
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Estilo para o parágrafo de confirmação */
+p {
+    text-align: center; /* Centralizar o texto */
+    margin-bottom: 20px;
+}
+
+/* Estilo para o link "Cancelar" */
+a.cancel-link {
+    display: block;
+    width: 200px;
+    margin: 0 auto; /* Centralizar horizontalmente */
+    text-align: center; /* Centralizar o texto */
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}

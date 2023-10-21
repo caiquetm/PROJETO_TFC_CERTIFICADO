@@ -1,8 +1,11 @@
 
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from app_certificado.models import Certificado
-from .models import Aluno
-from .forms import AlunoForm
+from .models import Aluno, Template
+from .forms import AlunoForm, TemplateForm
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 # Create your views here.
 def home(request):
@@ -35,7 +38,6 @@ def usuarios(request):
     return render(request, 'app_certificado/pages/usuario-view.html', context={
         'certificados': usuarios})
 
-
 def aluno(request, aluno_id): 
     certificados = get_list_or_404(
         Certificado.objects.filter(
@@ -46,24 +48,14 @@ def aluno(request, aluno_id):
         'certificados': certificados,
         'title': f'{certificados[0].aluno.nome}  - Aluno'})
 
-
-
 def usuario(request):
     return render(request, 'app_certificado/usuario.html')
 
-
-
 def certificado(request, id):
-    #certificado = Certificado.objects.filter(
-    #    pk = id,
-    #    ).order_by('-id').first()
-
-    certificado = get_object_or_404(Certificado,pk = id,)  
-      
+    certificado = get_object_or_404(Certificado,pk = id,)    
     return render(request, 'app_certificado/pages/certificado-view.html', context={
         'certificado': certificado,
         'is_detail_page': True})
-
 
 def template(request, template_id):
     certificados = Certificado.objects.filter(template__id = template_id).order_by('-id')
@@ -71,6 +63,12 @@ def template(request, template_id):
 
 
 
+
+
+
+
+
+#CRUD ALUNOS------------------------------------------------------------------------------------
 def lista_alunos(request):
     alunos = Aluno.objects.all()
     return render(request, 'app_certificado/pages/aluno/lista_alunos.html', {'alunos': alunos})
@@ -110,3 +108,40 @@ def inativar_aluno(request, aluno_id):
         aluno.save()
         return redirect('app_certificado:lista_alunos')
     return render(request, 'app_certificado/pages/aluno/inativar_aluno.html', {'aluno': aluno})
+#-----------------------------------------------------------------------------------------------
+
+#CRUD templates---------------------------------------------------------------------------------
+def lista_templates(request):
+    templates = Template.objects.all()
+    return render(request, 'app_certificado/pages/templateCertificado/lista_templates.html', {'templates': templates})
+
+def novo_template(request):
+    if request.method == 'POST':
+        form = TemplateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('app_certificado:lista_templates')
+    else:
+        form = TemplateForm()
+    return render(request, 'app_certificado/pages/templateCertificado/novo_template.html', {'form': form})
+
+def editar_template(request, template_id):
+    template = get_object_or_404(Template, pk=template_id)
+    if request.method == 'POST':
+        form = TemplateForm(request.POST, request.FILES, instance=template)
+        if form.is_valid():
+            form.save()
+            return redirect('app_certificado:lista_templates')
+    else:
+        form = TemplateForm(instance=template)
+    return render(request, 'app_certificado/pages/templateCertificado/editar_template.html', {'form': form, 'template': template})
+
+def inativar_template(request, template_id):
+    template = get_object_or_404(Template, pk=template_id)
+    if request.method == 'POST':
+        template.delete()
+        return redirect('app_certificado:lista_templates')
+    return render(request, 'app_certificado/pages/templateCertificado/inativar_template.html', {'template': template})
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#CRUD User--------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,18 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block title %} {{ certificado.title }} {% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<h1>Editar Template</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+</form>
+<a href="{% url 'app_certificado:lista_templates' %}" class="back-link">Voltar para a Lista de Templates</a>
+
+{% endblock content %}

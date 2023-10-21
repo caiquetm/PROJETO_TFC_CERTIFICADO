@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from . import views
 
@@ -16,6 +17,11 @@ urlpatterns = [
     path('alunos/novo/', views.novo_aluno, name="novo_aluno"),  # Criação de um novo aluno
     path('alunos/editar/<int:aluno_id>/', views.editar_aluno, name="editar_aluno"),  # Edição de um aluno existente
     path('alunos/inativar/<int:aluno_id>/', views.inativar_aluno, name="inativar_aluno"),  # Exclusão de um aluno
+
+    path('templates/', views.lista_templates, name='lista_templates'),
+    path('templates/novo/', views.novo_template, name='novo_template'),
+    path('templates/editar/<int:template_id>/', views.editar_template, name='editar_template'),
+    path('templates/inativar/<int:template_id>/', views.inativar_template, name='inativar_template'),
 
 ]
 

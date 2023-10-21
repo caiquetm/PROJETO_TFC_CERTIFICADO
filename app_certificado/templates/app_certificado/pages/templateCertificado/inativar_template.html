@@ -1,0 +1,18 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block title %} {{ certificado.title }} {% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<h1>Inativar Template</h1>
+<p>Tem certeza de que deseja inativar o template "{{ template.instituicao }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sim, Inativar</button>
+</form>
+<a href="{% url 'app_certificado:lista_templates' %}" class="cancel-link">Cancelar</a>
+
+{% endblock content %}

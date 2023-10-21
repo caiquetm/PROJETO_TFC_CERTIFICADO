@@ -1,0 +1,22 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block title %} {{ certificado.title }} {% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<h1>Lista de Templates</h1>
+<ul>
+    {% for template in templates %}
+        <li>
+            {{ template.instituicao }}
+            <a href="{% url 'app_certificado:editar_template' template.id %}" class="edit-link">Editar</a> 
+            <a href="{% url 'app_certificado:inativar_template' template.id %}" class="inactivate-link">Inativar</a>
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'app_certificado:novo_template' %}" class="add-link">Adicionar Novo Template</a>
+
+{% endblock content %}

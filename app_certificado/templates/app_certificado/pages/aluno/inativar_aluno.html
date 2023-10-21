@@ -1,0 +1,15 @@
+{% extends "global/base.html" %}
+
+{% block title %} {{ certificado.title }} {% endblock title %}
+
+{% block content %}
+
+<h1>Inativar Aluno</h1>
+    <p>Tem certeza de que deseja inativar o aluno "{{ aluno.nome }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sim, Inativar</button>
+    </form>
+    <a href="{% url 'app_certificado:lista_alunos' %}">Cancelar</a>
+
+{% endblock content %}

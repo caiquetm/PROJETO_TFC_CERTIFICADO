@@ -16,6 +16,7 @@ class Usuario(models.Model):
 class Aluno(models.Model):
     nome = models.CharField(max_length=50)
     horas = models.IntegerField()
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.nome

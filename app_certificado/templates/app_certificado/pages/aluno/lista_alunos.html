@@ -1,23 +1,23 @@
 {% extends "global/base.html" %}
 
-{% block title %} {{ certificado.title }} {% endblock title %}
+{% block title %} {{ aluno.title }} {% endblock title %}
 
 {% block content %}
 
-<h1>Lista de Alunos</h1>
-<ul>
-    {% for aluno in alunos %}
-        <li>
-            {{ aluno.nome }} - {{ aluno.horas }} horas
-               {% if aluno.status %}
-                <span style="color: red;">(Inativo)</span>
-            {% endif %}
-            <a href="{% url 'app_certificado:editar_aluno' aluno.id %}">Editar</a>
-            <a href="{% url 'app_certificado:inativar_aluno' aluno.id %}">Inativar</a>
-        </li>
-    {% endfor %}
-</ul>
-<a href="{% url 'app_certificado:novo_aluno' %}">Adicionar Novo Aluno</a>
+    <h1>Lista de Alunos</h1>
+    <ul>
+        {% for aluno in alunos %}
+            <li>
+                {{ aluno.nome }} - {{ aluno.horas }} horas
+                    {% if aluno.status %}
+                        <span style="color: red;">(Inativo)</span>
+                    {% endif %}
+                        <a href="{% url 'app_certificado:editar_aluno' aluno.id %}">Editar</a>
+                        <a href="{% url 'app_certificado:inativar_aluno' aluno.id %}">Inativar</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'app_certificado:novo_aluno' %}">Adicionar Novo Aluno</a>
 
 {% endblock content %}
 

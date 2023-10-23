@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Detalhes do Certificado</h2>
+  <p>Nome: {{ certificado.nome }}</p>
+  <p>Instituição: {{ certificado.instituicao }}</p>
+  <p>Duração: {{ certificado.duracao }}</p>
+  <p>Categoria: {{ certificado.categoria }}</p>
+  <p>Aluno: {{ certificado.aluno }}</p>
+  <p>Template: {{ certificado.template }}</p>
+  <p>Imagem: <img src="{{ certificado.imagem.url }}" alt="{{ certificado.nome }}"></p>
+  <a href="{% url 'app_certificado:lista_certificados' %}">Voltar para a lista de certificados</a>
+</div>

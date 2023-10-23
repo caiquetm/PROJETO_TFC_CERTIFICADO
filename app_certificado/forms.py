@@ -15,3 +15,8 @@ class CertificadoForm(forms.ModelForm):
     class Meta:
         model = Certificado
         fields = ['imagem']
+
+class CertificadoFormCriar(forms.ModelForm):
+    class Meta:
+        model = Certificado
+        fields = ['nome', 'instituicao', 'duracao', 'categoria', 'imagem', 'aluno', 'template']

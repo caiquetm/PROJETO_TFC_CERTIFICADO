@@ -25,6 +25,12 @@ urlpatterns = [
 
     path('enviar-certificado/', views.enviar_certificado, name='enviar_certificado'),
     path('sucesso/', views.sucesso, name='sucesso'),
+    path('certificados/', views.lista_certificados, name='lista_certificados'),
+    path('certificados/criar/', views.criar_certificado, name='criar_certificado'),
+    path('certificados/<int:certificado_id>/', views.ver_certificado, name='ver_certificado'),
+    path('certificados/<int:certificado_id>/atualizar/', views.atualizar_certificado, name='atualizar_certificado'),
+    path('certificados/<int:certificado_id>/excluir/', views.excluir_certificado, name='excluir_certificado'),
+
 
 ]
 

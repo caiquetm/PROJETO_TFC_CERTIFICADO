@@ -1,8 +1,8 @@
 
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from app_certificado.models import Certificado
-from .models import Aluno, Template
-from .forms import AlunoForm, TemplateForm, CertificadoForm
+from .models import Aluno, Template, Certificado
+from .forms import AlunoForm, TemplateForm, CertificadoForm,CertificadoFormCriar
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -64,12 +64,6 @@ def template(request, template_id):
     return render(request, 'app_certificado/template.html')
 
 
-
-
-
-
-
-
 #CRUD ALUNOS------------------------------------------------------------------------------------
 def lista_alunos(request):
     alunos = Aluno.objects.all()
@@ -112,6 +106,7 @@ def inativar_aluno(request, aluno_id):
     return render(request, 'app_certificado/pages/aluno/inativar_aluno.html', {'aluno': aluno})
 #-----------------------------------------------------------------------------------------------
 
+
 #CRUD templates---------------------------------------------------------------------------------
 def lista_templates(request):
     templates = Template.objects.all()
@@ -146,11 +141,12 @@ def inativar_template(request, template_id):
     return render(request, 'app_certificado/pages/templateCertificado/inativar_template.html', {'template': template})
 #-----------------------------------------------------------------------------------------------------------------------------------
 
+
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------------------
 
-#CRUD Certificado-------------------------------------------------------------------------------------------------------------------
 
+#CRUD Certificado-------------------------------------------------------------------------------------------------------------------
 def enviar_certificado(request):
     if request.method == 'POST':
         form = CertificadoForm(request.POST, request.FILES)
@@ -189,9 +185,44 @@ def enviar_certificado(request):
                 return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
     else:
         form = CertificadoForm()
-    return render(request, 'app_certificado/pages/Certificado/enviar_certificado.html', {'form': form})
-
+    return render(request, 'app_certificado/pages/certificado/enviar_certificado.html', {'form': form})
 
 def sucesso(request):
-    return render(request, 'app_certificado/pages/Certificado/sucesso.html')
+    return render(request, 'app_certificado/pages/certificado/sucesso.html')
+
+def lista_certificados(request):
+    certificados = Certificado.objects.all()
+    return render(request, 'app_certificado/pages/certificado/lista_certificados.html', {'certificados': certificados})
+
+def criar_certificado(request):
+    if request.method == 'POST':
+        form = CertificadoFormCriar(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('app_certificado:lista_certificados')
+    else:
+        form = CertificadoFormCriar()
+    return render(request, 'app_certificado/pages/certificado/criar_certificado.html', {'form': form})
+
+def ver_certificado(request, certificado_id):
+    certificado = get_object_or_404(Certificado, id=certificado_id)
+    return render(request, 'app_certificado/pages/certificado/ver_certificado.html', {'certificado': certificado})
+
+def atualizar_certificado(request, certificado_id):
+    certificado = get_object_or_404(Certificado, id=certificado_id)
+    if request.method == 'POST':
+        form = CertificadoForm(request.POST, request.FILES, instance=certificado)
+        if form.is_valid():
+            form.save()
+            return redirect('app_certificado:lista_certificados')
+    else:
+        form = CertificadoForm(instance=certificado)
+    return render(request, 'app_certificado/pages/certificado/atualizar_certificado.html', {'form': form})
+
+def excluir_certificado(request, certificado_id):
+    certificado = get_object_or_404(Certificado, id=certificado_id)
+    if request.method == 'POST':
+        certificado.delete()
+        return redirect('app_certificado:lista_certificados')
+    return render(request, 'app_certificado/pages/certificado/excluir_certificado.html', {'certificado': certificado})
 #-----------------------------------------------------------------------------------------------------------------------------------

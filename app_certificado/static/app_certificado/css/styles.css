@@ -124,9 +124,9 @@ h6 {
     padding-right: 3rem;
 }
 
-.search-button: :focus {
+.search-button:focus {
     outline: 1px solid var(--color-primary);
-    background: 
+    background: none;
 }
 
 .search-form:focus-within {
@@ -138,16 +138,6 @@ h6 {
     color: var(--color-primary);
 }
 
-.main-content {
-    
-    padding-top: 0;
-}
-
-.main-content-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: var(--spacing-gutter-large);
-}
 
 .certificado {
     background: var(--color-white);
@@ -196,6 +186,18 @@ h6 {
 
 .certificado-footer a:hover {
     filter: brightness(2);
+}
+
+.main-content {
+    
+    padding-top: 0;
+}
+
+.main-content-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    --spacing-gutter-large:4rem;
+    gap: var(--spacing-gutter-large);
 }
 
 .main-footer {
@@ -254,7 +256,7 @@ li {
 /* Estilo para os links de editar e inativar */
 a {
     text-decoration: none;
-    color: #fff;
+    color: #000000;
     padding: 5px 10px;
     border-radius: 5px;
     text-align: center;
@@ -279,14 +281,35 @@ a.add-link {
 /* Estilo para o link "Voltar para a Lista de Templates" */
 a.back-link {
     display: block;
+    width: 200px;
+    margin: 0 auto;
     text-align: center; /* Centralizar o texto */
-    margin-top: 20px;
     padding: 10px 20px;
     background-color: #28a745;
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
     margin-top: 20px;
+}
+
+.certificado-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estilo para os links de botões */
+a.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
 }
 
 /* Estilo para os links de botões */

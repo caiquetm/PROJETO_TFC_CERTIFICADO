@@ -23,5 +23,8 @@ urlpatterns = [
     path('templates/editar/<int:template_id>/', views.editar_template, name='editar_template'),
     path('templates/inativar/<int:template_id>/', views.inativar_template, name='inativar_template'),
 
+    path('enviar-certificado/', views.enviar_certificado, name='enviar_certificado'),
+    path('sucesso/', views.sucesso, name='sucesso'),
+
 ]
 

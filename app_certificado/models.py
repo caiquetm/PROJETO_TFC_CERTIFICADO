@@ -20,7 +20,7 @@ class Aluno(models.Model):
 
     def __str__(self):
         return self.nome
-    
+
 
 class Template(models.Model):
     instituicao = models.CharField(max_length=65)
@@ -44,3 +44,4 @@ class Certificado(models.Model):
 
     def __str__(self):
         return self.nome
+

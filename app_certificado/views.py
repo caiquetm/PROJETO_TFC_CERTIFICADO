@@ -2,10 +2,12 @@
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from app_certificado.models import Certificado
 from .models import Aluno, Template
-from .forms import AlunoForm, TemplateForm
+from .forms import AlunoForm, TemplateForm, CertificadoForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+import pytesseract
+from PIL import Image
 
 # Create your views here.
 def home(request):
@@ -145,3 +147,51 @@ def inativar_template(request, template_id):
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#CRUD Certificado-------------------------------------------------------------------------------------------------------------------
+
+def enviar_certificado(request):
+    if request.method == 'POST':
+        form = CertificadoForm(request.POST, request.FILES)
+        if form.is_valid():
+            certificado = form.save(commit=False)
+
+            # Verifica se a imagem foi carregada corretamente
+            imagem = certificado.imagem
+
+            if imagem:
+                # Carregua a imagem usando PIL
+                image = Image.open(imagem)
+
+                # Use o pytesseract para extrair o texto da imagem
+                texto_extraido = pytesseract.image_to_string(image)
+                linhas = texto_extraido.split('\n')
+                # Processar o texto extraído e inserir nos campos do Certificado
+                certificado.nome = linhas[6].upper()
+                certificado.instituicao = linhas[2]
+                # certificado.duracao = ...
+
+                # Buscar o aluno no banco de dados
+                try:
+                    aluno = Aluno.objects.get(nome=certificado.nome)
+                    certificado.aluno = aluno
+                except Aluno.DoesNotExist:
+                    #if is_admin:  # Verifique se o usuário é um administrador
+                        return redirect('app_certificado:novo_aluno')
+                    #else:
+                        # message = "Aluno não encontrado. Entre em contato com o administrador."
+                            # Renderizar um template com a mensagem
+                        # return render(request, 'seu_template_de_mensagem.html', {'message': message})
+                    
+                certificado.categoria = texto_extraido
+                certificado.save()
+                return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
+    else:
+        form = CertificadoForm()
+    return render(request, 'app_certificado/pages/Certificado/enviar_certificado.html', {'form': form})
+
+
+def sucesso(request):
+    return render(request, 'app_certificado/pages/Certificado/sucesso.html')
+#-----------------------------------------------------------------------------------------------------------------------------------

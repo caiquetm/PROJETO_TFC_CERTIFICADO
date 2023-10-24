@@ -147,27 +147,49 @@ def inativar_template(request, template_id):
 
 
 #CRUD Certificado-------------------------------------------------------------------------------------------------------------------
+import re
 def enviar_certificado(request):
     if request.method == 'POST':
         form = CertificadoForm(request.POST, request.FILES)
         if form.is_valid():
             certificado = form.save(commit=False)
-
             # Verifica se a imagem foi carregada corretamente
             imagem = certificado.imagem
-
             if imagem:
                 # Carregua a imagem usando PIL
                 image = Image.open(imagem)
-
                 # Use o pytesseract para extrair o texto da imagem
                 texto_extraido = pytesseract.image_to_string(image)
+                
+
+                #PROCURAR INSTITUIÇAO NA IMAGEM----------------------------------------------
+                match = re.search(r'Certificado(.*?)Certificamos', texto_extraido, re.DOTALL)
+                if match:
+                    instituicao_certificado = match.group(1).strip()
+                    certificado.instituicao = instituicao_certificado.upper()
+                #------------------------------------------------------------------------------
+
+                #PROCURAR NOME DO ALUNO NA IMAGEM----------------------------------------------
+                match = re.search(r'Certificamos que(.*?)participou', texto_extraido, re.DOTALL)
+                if match:
+                    nome_certificado = match.group(1).strip()
+                    certificado.nome = nome_certificado.upper()
+                #------------------------------------------------------------------------------
+
+                #PROCURAR HORAS NA IMAGEM----------------------------------------------
+                match = re.search(r'total de (.*?)horas', texto_extraido, re.DOTALL)
+                if match:
+                    horas_certificado = match.group(1).strip()
+                    certificado.duracao = horas_certificado.upper()
+                #------------------------------------------------------------------------------
+
+
                 linhas = texto_extraido.split('\n')
                 # Processar o texto extraído e inserir nos campos do Certificado
-                certificado.nome = linhas[6].upper()
-                certificado.instituicao = linhas[2]
-                # certificado.duracao = ...
-
+                #certificado.nome = linhas[6].upper()
+                #certificado.instituicao = linhas[2]
+                certificado.categoria = linhas[7]
+                # certificado.duracao = ...  
                 # Buscar o aluno no banco de dados
                 try:
                     aluno = Aluno.objects.get(nome=certificado.nome)
@@ -178,8 +200,7 @@ def enviar_certificado(request):
                     #else:
                         # message = "Aluno não encontrado. Entre em contato com o administrador."
                             # Renderizar um template com a mensagem
-                        # return render(request, 'seu_template_de_mensagem.html', {'message': message})
-                    
+                        # return render(request, 'seu_template_de_mensagem.html', {'message': message})      
                 certificado.categoria = texto_extraido
                 certificado.save()
                 return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
@@ -211,12 +232,12 @@ def ver_certificado(request, certificado_id):
 def atualizar_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     if request.method == 'POST':
-        form = CertificadoForm(request.POST, request.FILES, instance=certificado)
+        form = CertificadoFormCriar(request.POST, request.FILES, instance=certificado)
         if form.is_valid():
             form.save()
             return redirect('app_certificado:lista_certificados')
     else:
-        form = CertificadoForm(instance=certificado)
+        form = CertificadoFormCriar(instance=certificado)
     return render(request, 'app_certificado/pages/certificado/atualizar_certificado.html', {'form': form})
 
 def excluir_certificado(request, certificado_id):

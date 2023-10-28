@@ -1,7 +1,7 @@
-{% extends "base.html" %}
+{% extends "global/base.html" %}
 
 {% block content %}
-  <h2>Confirmar Exclusão</h2>
+  <h1>Confirmar Exclusão</h1>
   <p>Tem certeza de que deseja excluir o certificado "{{ certificado.nome }}"?</p>
   <form method="post">
     {% csrf_token %}
@@ -9,3 +9,4 @@
   </form>
   <a href="{% url 'app_certificado:lista_certificados' %}">Cancelar</a>
 </div>
+{% endblock content %}

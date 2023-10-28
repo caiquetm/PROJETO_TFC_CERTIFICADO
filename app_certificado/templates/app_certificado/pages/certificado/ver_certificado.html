@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "global/base.html" %}
 
 {% block content %}
   <h2>Detalhes do Certificado</h2>
@@ -9,5 +9,6 @@
   <p>Aluno: {{ certificado.aluno }}</p>
   <p>Template: {{ certificado.template }}</p>
   <p>Imagem: <img src="{{ certificado.imagem.url }}" alt="{{ certificado.nome }}"></p>
-  <a href="{% url 'app_certificado:lista_certificados' %}">Voltar para a lista de certificados</a>
+  <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Voltar para a lista de certificados</a>
 </div>
+{% endblock content %}

@@ -156,9 +156,9 @@ def enviar_certificado(request):
             # Verifica se a imagem foi carregada corretamente
             imagem = certificado.imagem
             if imagem:
-                # Carregua a imagem usando PIL
+                # Carrega a imagem usando PIL
                 image = Image.open(imagem)
-                # Use o pytesseract para extrair o texto da imagem
+                # Usa o pytesseract para extrair o texto da imagem
                 texto_extraido = pytesseract.image_to_string(image)
                 
 
@@ -167,6 +167,11 @@ def enviar_certificado(request):
                 if match:
                     instituicao_certificado = match.group(1).strip()
                     certificado.instituicao = instituicao_certificado.upper()
+                else:
+                    match = re.search(r'(.*?)Certificamos', texto_extraido, re.DOTALL)
+                    if match:
+                        instituicao_certificado = match.group(1).strip()
+                        certificado.instituicao = instituicao_certificado.upper()
                 #------------------------------------------------------------------------------
 
                 #PROCURAR NOME DO ALUNO NA IMAGEM----------------------------------------------
@@ -183,12 +188,19 @@ def enviar_certificado(request):
                     certificado.duracao = horas_certificado.upper()
                 #------------------------------------------------------------------------------
 
+                #PROCURAR CATEGORIA NA IMAGEM----------------------------------------------
+                match = re.search(r'participou (.*?),', texto_extraido, re.DOTALL)
+                if match:
+                    categoria_certificado = match.group(1).strip()
+                    certificado.categoria = categoria_certificado.upper()
+                #------------------------------------------------------------------------------
 
-                linhas = texto_extraido.split('\n')
+
+                #linhas = texto_extraido.split('\n')
                 # Processar o texto extraído e inserir nos campos do Certificado
                 #certificado.nome = linhas[6].upper()
                 #certificado.instituicao = linhas[2]
-                certificado.categoria = linhas[7]
+                #certificado.categoria = linhas[7]
                 # certificado.duracao = ...  
                 # Buscar o aluno no banco de dados
                 try:
@@ -201,7 +213,7 @@ def enviar_certificado(request):
                         # message = "Aluno não encontrado. Entre em contato com o administrador."
                             # Renderizar um template com a mensagem
                         # return render(request, 'seu_template_de_mensagem.html', {'message': message})      
-                certificado.categoria = texto_extraido
+                #certificado.categoria = texto_extraido
                 certificado.save()
                 return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
     else:
@@ -228,6 +240,15 @@ def criar_certificado(request):
 def ver_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     return render(request, 'app_certificado/pages/certificado/ver_certificado.html', {'certificado': certificado})
+
+def search_certificados(request):
+    if request.method == 'GET':
+        query = request.GET.get('search', '')  # Obtém o termo de pesquisa do formulário
+        certificados = Certificado.objects.filter(aluno__nome__icontains=query)
+        
+        return render(request, 'search.html', {'certificados': certificados, 'search_query': query})
+
+    return render(request, 'lista_certificados.html')
 
 def atualizar_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)

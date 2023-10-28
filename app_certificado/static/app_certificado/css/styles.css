@@ -95,6 +95,7 @@ h6 {
     margin-right: 2rem;
 }
 
+
 .search-form {
     border: .2rem solid var(--color-primary-dark);
     max-width: 64rem;
@@ -375,4 +376,8 @@ a.cancel-link {
     text-decoration: none;
     border-radius: 5px;
     margin-top: 20px;
+}
+
+.hidden-text {
+    display: none;
 }

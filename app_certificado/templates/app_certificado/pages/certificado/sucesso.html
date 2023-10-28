@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sucesso</title>
-</head>
-<body>
+{% extends "global/base.html" %}
+
+{% block title %} {{ certificado.title }} {% endblock title %}
+
+{% block content %}
+
     <h1>Envio de Certificado Bem-sucedido</h1>
     <p>Seu certificado de horas complementares foi enviado com sucesso. Obrigado!</p>
-    <a href="{% url 'app_certificado:enviar_certificado' %}">Enviar outro certificado</a>
-</body>
-</html>
+    <a href="{% url 'app_certificado:enviar_certificado' %}" class="back-link">Enviar outro certificado</a>
+{% endblock content %}

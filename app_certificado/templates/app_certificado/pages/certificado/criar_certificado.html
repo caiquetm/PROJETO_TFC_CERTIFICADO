@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "global/base.html" %}
 
 {% block content %}
   <h2>Criar Certificado</h2>
@@ -8,4 +8,4 @@
     <button type="submit">Salvar</button>
   </form>
   <a href="{% url 'app_certificado:lista_certificados' %}">Voltar para a lista de certificados</a>
-{% endblock %}
+  {% endblock content %}

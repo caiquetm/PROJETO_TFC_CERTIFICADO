@@ -1,0 +1,20 @@
+{% extends "global/base.html" %}
+
+
+
+{% block title %} {{ user.title }} {% endblock title %}
+
+{% block content %}
+    <div class='main-content center container'>
+        <h1>{% if user.id %}Criar Usuário{% else %}Editar Usuário{% endif %}</h1>
+    </div>
+
+    <div class='main-content container'>        
+        <form method="post">
+            {% csrf_token %}            
+            {{ form.as_p }}
+            <button type="submit">Salvar</button>
+        </form>
+    </div>
+    <a href="{% url 'app_certificado:user_list' %}" class="back-link">Voltar para a lista de usuários</a>
+{% endblock content %}

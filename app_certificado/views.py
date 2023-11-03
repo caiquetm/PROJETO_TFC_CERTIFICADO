@@ -2,7 +2,7 @@
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from app_certificado.models import Certificado
 from .models import Aluno, Template, Certificado
-from .forms import AlunoForm, TemplateForm, CertificadoForm,CertificadoFormCriar
+from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -143,6 +143,39 @@ def inativar_template(request, template_id):
 
 
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
+from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from .forms import UserFormCriar
+
+class UserCreateView(CreateView):
+    model = get_user_model()
+    template_name = 'app_certificado/pages/user/user_form.html'
+    #form_class = CustomUserCreationForm  
+    success_url = reverse_lazy('user_list')
+
+class UserListView(ListView):
+    model = get_user_model()
+    template_name = 'app_certificado/pages/user/user_list.html'
+    context_object_name = 'users'
+    def get_queryset(self):
+        return self.model.objects.all()
+
+class UserUpdateView(UpdateView):
+    model = get_user_model()
+    template_name = 'app_certificado/pages/user/user_form.html'
+    fields = '__all__'
+    success_url = reverse_lazy('user_list')
+
+class UserDeleteView(DeleteView):
+    model = get_user_model()
+    template_name = 'app_certificado/pages/user/user_confirm_delete.html'
+    success_url = reverse_lazy('user_list')
+
+def novo_usuario(request):
+    form = UserFormCriar()
+    return render(request, 'app_certificado/pages/user/user_form.html', {
+        'form': form
+    })
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 

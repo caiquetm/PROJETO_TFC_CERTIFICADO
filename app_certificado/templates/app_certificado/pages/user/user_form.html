@@ -10,11 +10,19 @@
     </div>
 
     <div class='main-content container'>        
-        <form method="post">
-            {% csrf_token %}            
-            {{ form.as_p }}
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="form-content form-content-grid">
+                {% for field in form %}
+                    <div class="form-group">
+                      <label for="{{ field.id_for_label }}"> {{field.label}} </label>
+                      {{field}}
+                    </div>
+                {% endfor %}
+            </div>           
             <button type="submit">Salvar</button>
         </form>
     </div>
+
     <a href="{% url 'app_certificado:user_list' %}" class="back-link">Voltar para a lista de usuários</a>
 {% endblock content %}

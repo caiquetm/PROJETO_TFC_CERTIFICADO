@@ -1,7 +1,5 @@
 {% extends "global/base.html" %}
 
-{% load static %}
-
 {% block title %} {{ user.title }} {% endblock title %}
 
 {% block content %}
@@ -10,8 +8,8 @@
 <p>Tem certeza de que deseja excluir o usuário "{{ user.username }}"?</p>
 <form method="post">
     {% csrf_token %}
-    <input type="submit" value="Confirmar Exclusão">
+    <button type="submit">Confirmar Exclusão</button>
 </form>
-<a href="{% url 'user_list' %}">Cancelar</a>
+<a href="{% url 'app_certificado:user_list' %}" class="back-link" >Cancelar</a>
 
 {% endblock content %}

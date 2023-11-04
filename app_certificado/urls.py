@@ -10,7 +10,11 @@ urlpatterns = [
     path('', views.home, name="home"),
 
     path('users/', views.UserListView.as_view(), name='user_list'),
-    path('users/create/', views.novo_usuario, name='user_create'),
+    path('users/register/', views.novo_usuario, name='user_register'),
+    path('users/register/create/', views.novo_usuario_criar, name='user_create'),
+    path('users/edit/<int:user_id>/', views.usuario_editar, name='user_edit'),
+    path('users/delete/<int:user_id>/', views.usuario_excluir, name='user_delete'),
+
 
     #path('', views.usuario, name="usuario"),
     path('certificados/<int:id>/', views.certificado, name="certificado"),

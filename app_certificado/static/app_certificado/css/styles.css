@@ -440,3 +440,24 @@ a.cancel-link {
     color: var(--color-primary);
     font-size: 1.6rem;
   }
+
+  .user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    text-align: left;
+  }
+  
+  .user-actions {
+    text-align: right;
+  }

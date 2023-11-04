@@ -1,11 +1,12 @@
 
+from django.http import Http404
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
-from app_certificado.models import Certificado
-from .models import Aluno, Template, Certificado
-from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Aluno, Template, Certificado
+from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar
 import pytesseract
 from PIL import Image
 
@@ -145,7 +146,7 @@ def inativar_template(request, template_id):
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from .forms import UserFormCriar
+from .forms import UserFormCriar, UserFormEditar
 
 class UserCreateView(CreateView):
     model = get_user_model()
@@ -172,10 +173,71 @@ class UserDeleteView(DeleteView):
     success_url = reverse_lazy('user_list')
 
 def novo_usuario(request):
-    form = UserFormCriar()
+    register_form_data = request.session.get('register_form_data', None)
+    form = UserFormCriar(register_form_data)
     return render(request, 'app_certificado/pages/user/user_form.html', {
         'form': form
     })
+
+def novo_usuario_criar(request):
+    if not request.POST:
+        raise Http404()
+
+    POST = request.POST
+    request.session['register_form_data'] = POST
+    form = UserFormCriar(POST)
+
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password1']  # Obtenha a senha do formulário
+
+        # Crie uma instância do usuário e defina a senha
+        user = User(username=username, email=email)
+        user.set_password(password)  # Defina a senha usando set_password
+        user.save()  # Salve o usuário no banco de dados
+
+        messages.success(request, 'Usuário criado com sucesso')
+
+        del(request.session['register_form_data'])
+
+    return redirect('app_certificado:user_register')
+
+
+
+
+
+
+def usuario_editar(request, user_id):
+    
+    user = User.objects.get(pk=user_id)
+
+    if request.method == 'POST':
+        form = UserFormEditar(request.POST, instance=user)  
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Usuário atualizado com sucesso')
+            del(request.session['register_form_data'])
+            return redirect('app_certificado:user_list')  # Redirecione para a lista de usuários após a edição
+
+    else:
+        form = UserFormEditar(instance=user)
+
+    return render(request, 'app_certificado/pages/user/user_form.html', {
+        'form': form,
+        'user': user,
+    })
+
+def usuario_excluir(request, user_id):
+    # Recupere o usuário com base no ID fornecido
+    user = User.objects.get(pk=user_id)
+
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, 'Usuário excluído com sucesso')
+        return redirect('app_certificado:user_list')  # Redirecione para a lista de usuários após a exclusão
+
+    return render(request, 'app_certificado/pages/user/user_confirm_delete.html', {'user': user})
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 

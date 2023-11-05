@@ -4,11 +4,11 @@
 
 {% block content %}
 
-<h1>Inativar Aluno</h1>
-    <p>Tem certeza de que deseja inativar o aluno "{{ aluno.nome }}"?</p>
+<h1>Reativar Aluno</h1>
+    <p>Reativar o aluno "{{ aluno.nome }}"?</p>
     <form class="form-certificados" method="post">
         {% csrf_token %}
-        <button type="submit">Sim, Inativar</button>
+        <button type="submit">Sim, Reativar</button>
     </form>
     <a href="{% url 'app_certificado:lista_alunos' %}" class="back-link">Cancelar</a>
 

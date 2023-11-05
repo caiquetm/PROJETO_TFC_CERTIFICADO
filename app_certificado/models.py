@@ -14,7 +14,7 @@ class Usuario(models.Model):
 
 class Aluno(models.Model):
     nome = models.CharField(max_length=50)
-    horas = models.IntegerField()
+    horas = models.IntegerField(default=0)
     status = models.BooleanField(default=False)
 
     def __str__(self):
@@ -43,4 +43,9 @@ class Certificado(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    def update_aluno_horas(self):
+        if self.status == 1 and self.aluno:
+            self.aluno.horas += int(self.duracao)
+            self.aluno.save()
 

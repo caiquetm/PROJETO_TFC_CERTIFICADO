@@ -4,7 +4,7 @@
   <h1>Atualizar Certificado</h1>
 
 <div class='main-content container'>   
-    <form method="post" enctype="multipart/form-data">
+    <form class="form-certificados" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-content center form-content-grid">
               {% for field in form %}

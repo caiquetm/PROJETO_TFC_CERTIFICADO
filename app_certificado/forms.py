@@ -17,7 +17,7 @@ def add_placeholder(field, placeholder_val):
 class AlunoForm(forms.ModelForm):
     class Meta:
         model = Aluno
-        fields = ['nome', 'horas']
+        fields = ['nome']
 
 class TemplateForm(forms.ModelForm):
     class Meta:
@@ -125,18 +125,20 @@ class UserFormEditar(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    username = forms.CharField(
-        label='Nome de Usuário',
-        max_length=150,
-        help_text='',
-        widget=forms.TextInput(attrs={'placeholder': 'Nome de Usuário'})
-    )
     email = forms.EmailField(
         label='Endereço de Email',
         max_length=254,
-        help_text='',
+        help_text='Informe um endereço de email válido.',
         widget=forms.EmailInput(attrs={'placeholder': 'Endereço de Email'})
     )
+
+    username = forms.CharField(
+        label='Nome de Usuário',
+        max_length=150,
+        help_text='Escolha um nome de usuário exclusivo.',
+        widget=forms.TextInput(attrs={'placeholder': 'Nome de Usuário'})
+    )
+
     is_staff = forms.BooleanField(
         label='É administrador?',
         required=False,
@@ -144,18 +146,18 @@ class UserFormEditar(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '')
-        exists = User.objects.filter(email=email).exclude(pk=self.instance.pk).exists()
+        user = User.objects.filter(email=email).exclude(pk=self.instance.pk).first()
 
-        if exists:
+        if user:
             raise ValidationError('Endereço de email já em uso', code='invalid')
 
         return email
 
     def clean_username(self):
         username = self.cleaned_data.get('username', '')
-        exists = User.objects.filter(username=username).exclude(pk=self.instance.pk).exists()
+        user = User.objects.filter(username=username).exclude(pk=self.instance.pk).first()
 
-        if exists:
+        if user:
             raise ValidationError('Nome de usuário já em uso', code='invalid')
 
         return username

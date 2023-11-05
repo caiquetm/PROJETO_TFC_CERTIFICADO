@@ -5,6 +5,7 @@
 {% block content %}
   <h1>Lista de Usuários</h1>
   <ul>
+    <div class="users-dashboard-container">
     {% for user in users %}
       <li class="user-list-item">
         <div class="user-info">
@@ -16,6 +17,7 @@
         </div>
       </li>
     {% endfor %}
+  </div>
   </ul>
   <a href="{% url 'app_certificado:user_register' %}" class="add-link">Adicionar Usuário</a>
 {% endblock content %}

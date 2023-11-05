@@ -9,6 +9,7 @@
 
 <h1>Lista de Templates</h1>
 <ul>
+    <div class="users-dashboard-container">
     {% for template in templates %}
         <li>
             {{ template.instituicao }}
@@ -16,6 +17,7 @@
             <a href="{% url 'app_certificado:inativar_template' template.id %}" class="inactivate-link">Inativar</a>
         </li>
     {% endfor %}
+    </div>
 </ul>
 <a href="{% url 'app_certificado:novo_template' %}" class="add-link">Adicionar Novo Template</a>
 

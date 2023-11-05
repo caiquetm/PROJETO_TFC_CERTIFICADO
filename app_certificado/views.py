@@ -1,47 +1,34 @@
 
 from django.http import Http404
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, get_user_model, logout
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Aluno, Template, Certificado
 from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar, LoginForm, UserFormCriar, UserFormEditar
 import pytesseract
 from PIL import Image
+from django.db.models import Q
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
 
 # Create your views here.
+def is_staff(user):
+    return user.is_staff
+
 def home(request):
     certificados = Certificado.objects.all().order_by('-id')
     return render(request, 'app_certificado/pages/home.html', context={
         'certificados': certificados})
 
-def alunos(request):
-    alunos = Certificado.objects.all().order_by('-id')
-    return render(request, 'app_certificado/pages/aluno-view.html', context={
-        'alunos': alunos})
-
 def certificados(request):
     certificados = Certificado.objects.all().order_by('-id')
     return render(request, 'app_certificado/pages/certificado-view.html', context={
         'certificados': certificados})
-
-def templates(request):
-    templates = Certificado.objects.all().order_by('-id')
-    return render(request, 'app_certificado/pages/template-view.html', context={
-        'templates': templates})
-
-def usuarios(request):
-    usuarios = Certificado.objects.all().order_by('-id')
-    return render(request, 'app_certificado/pages/usuario-view.html', context={
-        'usuarios': usuarios})
-
-def usuarios(request):
-    usuarios = Certificado.objects.all().order_by('-id')
-    return render(request, 'app_certificado/pages/usuario-view.html', context={
-        'certificados': usuarios})
 
 def aluno(request, aluno_id): 
     certificados = get_list_or_404(
@@ -53,25 +40,21 @@ def aluno(request, aluno_id):
         'certificados': certificados,
         'title': f'{certificados[0].aluno.nome}  - Aluno'})
 
-def usuario(request):
-    return render(request, 'app_certificado/usuario.html')
-
 def certificado(request, id):
     certificado = get_object_or_404(Certificado,pk = id,)    
     return render(request, 'app_certificado/pages/certificado-view.html', context={
         'certificado': certificado,
         'is_detail_page': True})
 
-def template(request, template_id):
-    certificados = Certificado.objects.filter(template__id = template_id).order_by('-id')
-    return render(request, 'app_certificado/template.html')
 
 
 #CRUD ALUNOS------------------------------------------------------------------------------------
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def lista_alunos(request):
     alunos = Aluno.objects.all()
     return render(request, 'app_certificado/pages/aluno/lista_alunos.html', {'alunos': alunos})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def novo_aluno(request):
     if request.method == 'POST':
         form = AlunoForm(request.POST)
@@ -82,6 +65,7 @@ def novo_aluno(request):
         form = AlunoForm()
     return render(request, 'app_certificado/pages/aluno/novo_aluno.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def editar_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
     if request.method == 'POST':
@@ -93,6 +77,7 @@ def editar_aluno(request, aluno_id):
         form = AlunoForm(instance=aluno)
     return render(request, 'app_certificado/pages/aluno/editar_aluno.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def excluir_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
     if request.method == 'POST':
@@ -100,6 +85,7 @@ def excluir_aluno(request, aluno_id):
         return redirect('app_certificado:lista_alunos')
     return render(request, 'app_certificado/pages/aluno/excluir_aluno.html', {'aluno': aluno})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def inativar_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
     if request.method == 'POST':
@@ -107,14 +93,25 @@ def inativar_aluno(request, aluno_id):
         aluno.save()
         return redirect('app_certificado:lista_alunos')
     return render(request, 'app_certificado/pages/aluno/inativar_aluno.html', {'aluno': aluno})
+
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
+def ativar_aluno(request, aluno_id):
+    aluno = get_object_or_404(Aluno, pk=aluno_id)
+    if request.method == 'POST':
+        aluno.status = False  # Defina o status como False para ativar o aluno
+        aluno.save()
+        return redirect('app_certificado:lista_alunos')
+    return render(request, 'app_certificado/pages/aluno/ativar_aluno.html', {'aluno': aluno})
 #-----------------------------------------------------------------------------------------------
 
 
 #CRUD templates---------------------------------------------------------------------------------
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def lista_templates(request):
     templates = Template.objects.all()
     return render(request, 'app_certificado/pages/templateCertificado/lista_templates.html', {'templates': templates})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def novo_template(request):
     if request.method == 'POST':
         form = TemplateForm(request.POST, request.FILES)
@@ -125,6 +122,7 @@ def novo_template(request):
         form = TemplateForm()
     return render(request, 'app_certificado/pages/templateCertificado/novo_template.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def editar_template(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
     if request.method == 'POST':
@@ -136,6 +134,7 @@ def editar_template(request, template_id):
         form = TemplateForm(instance=template)
     return render(request, 'app_certificado/pages/templateCertificado/editar_template.html', {'form': form, 'template': template})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def inativar_template(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
     if request.method == 'POST':
@@ -146,30 +145,14 @@ def inativar_template(request, template_id):
 
 
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
-class UserCreateView(CreateView):
-    model = get_user_model()
-    template_name = 'app_certificado/pages/user/user_form.html'
-    #form_class = CustomUserCreationForm  
-    success_url = reverse_lazy('user_list')
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
+def user_list(request):
+    users = User.objects.all()  # Retrieve all users from the database
+    return render(request, 'app_certificado/pages/user/user_list.html', {
+        'users': users,
+    })
 
-class UserListView(ListView):
-    model = get_user_model()
-    template_name = 'app_certificado/pages/user/user_list.html'
-    context_object_name = 'users'
-    def get_queryset(self):
-        return self.model.objects.all()
-
-class UserUpdateView(UpdateView):
-    model = get_user_model()
-    template_name = 'app_certificado/pages/user/user_form.html'
-    fields = '__all__'
-    success_url = reverse_lazy('user_list')
-
-class UserDeleteView(DeleteView):
-    model = get_user_model()
-    template_name = 'app_certificado/pages/user/user_confirm_delete.html'
-    success_url = reverse_lazy('user_list')
-
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def novo_usuario(request):
     register_form_data = request.session.get('register_form_data', None)
     form = UserFormCriar(register_form_data)
@@ -177,30 +160,33 @@ def novo_usuario(request):
         'form': form
     })
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def novo_usuario_criar(request):
-    if not request.POST:
-        raise Http404()
+    if request.method == 'POST':
+        form = UserFormCriar(request.POST)
 
-    POST = request.POST
-    request.session['register_form_data'] = POST
-    form = UserFormCriar(POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
 
-    if form.is_valid():
-        username = form.cleaned_data['username']
-        email = form.cleaned_data['email']
-        password = form.cleaned_data['password1']  # Obtenha a senha do formulário
+            user = User(username=username, email=email)
+            user.set_password(password)
+            user.save()
 
-        # Crie uma instância do usuário e defina a senha
-        user = User(username=username, email=email)
-        user.set_password(password)  # Defina a senha usando set_password
-        user.save()  # Salve o usuário no banco de dados
+            messages.success(request, 'Usuário criado com sucesso')
 
-        messages.success(request, 'Usuário criado com sucesso')
+            # Limpa os dados da sessão
+            if 'register_form_data' in request.session:
+                del request.session['register_form_data']
 
-        del(request.session['register_form_data'])
+            return redirect('app_certificado:user_list')
+    else:
+        form = UserFormCriar()
 
-    return redirect('app_certificado:user_register')
+    return render(request, 'app_certificado/pages/user/user_create.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def usuario_editar(request, user_id):
     
     user = User.objects.get(pk=user_id)
@@ -210,17 +196,19 @@ def usuario_editar(request, user_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Usuário atualizado com sucesso')
-            del(request.session['register_form_data'])
-            return redirect('app_certificado:user_list')  # Redirecione para a lista de usuários após a edição
+            if 'register_form_data' in request.session:
+                del request.session['register_form_data']
+            return redirect('app_certificado:user_list')  # Redirect to the user list after editing
 
     else:
         form = UserFormEditar(instance=user)
 
-    return render(request, 'app_certificado/pages/user/user_form.html', {
+    return render(request, 'app_certificado/pages/user/user_edit.html', {
         'form': form,
         'user': user,
     })
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def usuario_excluir(request, user_id):
     # Recupere o usuário com base no ID fornecido
     user = User.objects.get(pk=user_id)
@@ -231,8 +219,6 @@ def usuario_excluir(request, user_id):
         return redirect('app_certificado:user_list')  # Redirecione para a lista de usuários após a exclusão
 
     return render(request, 'app_certificado/pages/user/user_confirm_delete.html', {'user': user})
-
-from django.contrib.auth import authenticate, login as auth_login  # Renomeie a função 'login'
 
 def user_login(request):
     form = LoginForm()
@@ -255,12 +241,16 @@ def login_create(request):
         if authenticated_user is not None:
             messages.success(request, 'Logado com sucesso')
             auth_login(request, authenticated_user)
+            if authenticated_user.is_staff:
+                return redirect('app_certificado:dashboard')  
+            else:
+                return redirect('app_certificado:home')  
         else:
             messages.error(request, 'Credenciais Inválidas')
     else:
         messages.error(request, 'Erro ao validar dados')
 
-    return redirect(reverse('app_certificado:dashboard'))
+    return redirect('app_certificado:login') 
 
 @login_required(login_url='app_certificado:login', redirect_field_name='next')
 def user_logout(request):
@@ -270,7 +260,7 @@ def user_logout(request):
     logout(request)
     return redirect(reverse('app_certificado:login'))
 
-@login_required(login_url='app_certificado:login', redirect_field_name='next')
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def dashboard(request):
     certificados = Certificado.objects.filter(
         status = False,
@@ -279,7 +269,7 @@ def dashboard(request):
         'certificados': certificados,
     })
 
-@login_required(login_url='app_certificado:login', redirect_field_name='next')
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def dashboard_certificado_edit(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     if request.method == 'POST':
@@ -295,6 +285,7 @@ def dashboard_certificado_edit(request, certificado_id):
 
 #CRUD Certificado-------------------------------------------------------------------------------------------------------------------
 import re
+@login_required(login_url='app_certificado:login', redirect_field_name='next')
 def enviar_certificado(request):
     if request.method == 'POST':
         form = CertificadoForm(request.POST, request.FILES)
@@ -367,8 +358,22 @@ def enviar_certificado(request):
                             # Renderizar um template com a mensagem
                         # return render(request, 'seu_template_de_mensagem.html', {'message': message})      
                 #certificado.categoria = texto_extraido
+                #certificado.save()
+                #return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
+    
+            # Check if a similar certificate already exists in the database
+            existing_certificates = Certificado.objects.filter(
+                Q(nome=certificado.nome) & Q(instituicao=certificado.instituicao) & Q(duracao=certificado.duracao)
+            )
+            
+            if existing_certificates.exists():
+                # A similar certificate already exists, handle this case (e.g., show an error message)
+                messages.error(request, 'Um certificado semelhante já existe no banco de dados.')
+            else:
+                # Save the certificate if no similar certificate exists
                 certificado.save()
-                return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
+                messages.success(request, 'Certificado salvo com sucesso.')
+                return redirect('app_certificado:sucesso')  # Redirect to the success page
     else:
         form = CertificadoForm()
     return render(request, 'app_certificado/pages/certificado/enviar_certificado.html', {'form': form})
@@ -380,6 +385,7 @@ def lista_certificados(request):
     certificados = Certificado.objects.all()
     return render(request, 'app_certificado/pages/certificado/lista_certificados.html', {'certificados': certificados})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def criar_certificado(request):
     if request.method == 'POST':
         form = CertificadoFormCriar(request.POST, request.FILES)
@@ -390,6 +396,7 @@ def criar_certificado(request):
         form = CertificadoFormCriar()
     return render(request, 'app_certificado/pages/certificado/criar_certificado.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def ver_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     return render(request, 'app_certificado/pages/certificado/ver_certificado.html', {'certificado': certificado})
@@ -403,6 +410,7 @@ def search_certificados(request):
 
     return render(request, 'lista_certificados.html')
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def atualizar_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     if request.method == 'POST':
@@ -414,10 +422,20 @@ def atualizar_certificado(request, certificado_id):
         form = CertificadoFormCriar(instance=certificado)
     return render(request, 'app_certificado/pages/certificado/atualizar_certificado.html', {'form': form})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def excluir_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     if request.method == 'POST':
         certificado.delete()
         return redirect('app_certificado:lista_certificados')
     return render(request, 'app_certificado/pages/certificado/excluir_certificado.html', {'certificado': certificado})
+
+def search_certificados(request):
+    query = request.GET.get('search', '')
+    certificados = Certificado.objects.filter(Q(instituicao__icontains=query) | Q(nome__icontains=query))
+
+    return render(request, 'app_certificado/pages/certificado/search_results.html', {
+        'certificados': certificados,
+        'query': query,
+    })
 #-----------------------------------------------------------------------------------------------------------------------------------

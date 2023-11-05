@@ -37,7 +37,11 @@
 
   {% if is_detail_page is True %}
   </div>
-  <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Voltar para a lista de certificados</a>
+    {% if user.is_staff %}
+    <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Voltar para a lista de certificados</a>
+    {% else %}
+    <a href="{% url 'app_certificado:home' %}" class="back-link">Voltar para a home</a>
+    {% endif %}
   {% endif %}
     
 </div>

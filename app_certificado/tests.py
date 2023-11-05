@@ -66,7 +66,7 @@ class FormTests(TestCase):
 
 
     def test_certificado_form_criar_valid_data(self):
-        aluno = Aluno.objects.create(nome="Nome do Aluno", horas=0)
+        aluno = Aluno.objects.create(nome="CAIQUE TELES DE MOURA", horas=0)
         template = Template.objects.create(instituicao="Instituição XYZ", imagem="caminho/para/imagem_template.jpg")
 
         # Crie um arquivo temporário de imagem
@@ -206,3 +206,8 @@ def test_template_view():
     response = template(request, template.id)
     assert response.status_code == 200
 
+def test_search_url_is_correct(self):
+    url = reverse('app_certificado:search')
+    self.assertEqual(url, '/search/')
+
+def test_search_uses_correct_view_function(self):

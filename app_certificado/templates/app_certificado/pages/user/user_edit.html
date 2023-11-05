@@ -1,34 +1,32 @@
 {% extends "global/base.html" %}
 
-{% block title %} {{ user.title }} {% endblock title %}
+{% block title %}Editar Usuário{% endblock title %}
 
 {% block content %}
     <div class='main-content center container'>
-        <h1>{% if user.id %}Criar Usuário{% else %}Editar Usuário{% endif %}</h1>
+        <h1>Editar Usuário</h1>
     </div>
 
-    <div class='main-content container'>        
-        <form class="form-certificados" action=" {% url 'app_certificado:user_create' %} " method='POST'>
+    <div class='main-content container'>
+        <form class="form-certificados" action="{% url 'app_certificado:user_edit' user.id %}" method='POST'>
             {% csrf_token %}
             <div class="form-content form-content-grid">
                 {% for field in form %}
                     <div class="form-group">
-                      <label for="{{ field.id_for_label }}"> {{field.label}} </label>
-                      {{field}}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
                     </div>
                 {% endfor %}
-            </div> 
-            
+            </div>
+
             {% if form.errors %}
             <div class="form-content form-content-grid">
-                <div class="form-group">
                 <div class="message message-error">
-                    Existem erros no formulario.
-                </div>
+                    Existem erros no formulário.
                 </div>
             </div>
             {% endif %}
-            
+
             <button type="submit">Salvar</button>
         </form>
     </div>

@@ -119,9 +119,7 @@ h6 {
 }
 
 .search-button {
-    position: absolute;
-    top: 0;
-    right: 0;
+    background-color: #000;
 }
 
 .search-input {
@@ -283,6 +281,7 @@ a.add-link {
     margin-top: 20px;
 }
 
+
 /* Estilo para o link "Voltar para a Lista de Templates" */
 a.back-link {
     display: block;
@@ -334,12 +333,18 @@ a.edit-link {
 }
 
 /* Estilo para o link de "Inativar Template" */
+a.activate-link {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Estilo para o link de "Inativar Template" */
 a.inactivate-link {
     background-color: #dc3545;
     color: #fff;
 }
 
-form {
+.form-certificados {
     max-width: 400px;
     margin: 0 auto; /* Centralizar o formulário horizontalmente */
     padding: 20px;
@@ -531,4 +536,52 @@ a.cancel-link {
     cursor: pointer;
     color: var(--color-primary);
     font-size: 1.6rem;
+  }
+  
+/* CSS for the menu */
+.menu-content {
+    background-color: #333; /* Background color for the menu */
+}
+
+.inline-form {
+    display: inline;
+    background-color: black;
+  }
+
+.menu-nav {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.menu-nav a {
+    text-decoration: none;
+    color: #fff; /* Text color for menu items */
+    padding: 10px 15px; /* Adjust padding as needed */
+}
+
+.menu-nav a:hover {
+    background-color: #555; /* Background color for menu items on hover */
+}
+
+/* CSS for the "Logout" link */
+.menu-nav a[href*="user_logout"] {
+    background-color: #d9534f; /* Background color for logout link */
+    border-radius: 5px;
+    color: #fff; /* Text color for logout link */
+}
+
+.menu-nav a[href*="user_logout"]:hover {
+    background-color: #c9302c; /* Background color for logout link on hover */
+}
+
+/* You can add more CSS rules to style the other links as needed */
+
+  @media (max-width: 600px) {
+    .main-content-list,
+    .form-content-grid {
+      grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    }
   }

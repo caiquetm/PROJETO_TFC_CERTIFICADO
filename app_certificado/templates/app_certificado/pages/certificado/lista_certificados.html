@@ -6,17 +6,19 @@
 
     <h1>Certificados</h1>
     <ul>
+        <div class="users-dashboard-container">
         {% for certificado in certificados %}
             <li>
-                <div class="certificado-info">
-                    <a href="{% url 'app_certificado:ver_certificado' certificado.id %}" class="edit-link">{{ certificado.nome }} - {{ certificado.instituicao }}</a>
+                <div class="certificado-info">  
                     <div class="certificado-actions">
+                        <a href="{% url 'app_certificado:ver_certificado' certificado.id %}" >{{ certificado.nome }} - {{ certificado.instituicao }}</a>
                         - <a href="{% url 'app_certificado:atualizar_certificado' certificado.id %}" class="edit-link">Editar</a>
                         - <a href="{% url 'app_certificado:excluir_certificado' certificado.id %}" class="inactivate-link">Excluir</a>
                     </div>
                 </div>
             </li>
         {% endfor %}
+    </div>
     </ul>
     <a class="add-link" href="{% url 'app_certificado:criar_certificado' %}" class="add-link">Criar novo certificado</a>
 

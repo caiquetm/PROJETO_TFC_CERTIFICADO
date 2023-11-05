@@ -40,8 +40,10 @@ urlpatterns = [
     path('certificados/<int:certificado_id>/atualizar/', views.atualizar_certificado, name='atualizar_certificado'),
     path('certificados/<int:certificado_id>/excluir/', views.excluir_certificado, name='excluir_certificado'),
 
-    path('login/', auth_views.LoginView.as_view(template_name='app_certificado/pages/registration/login.html'), name='login'),
-
-
+    path('login/', views.user_login, name='login'),
+    path('login/create/', views.login_create, name='login_create'),
+    path('logout/', views.user_logout, name='user_logout'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/certificado/<int:certificado_id>/edit', views.dashboard_certificado_edit, name='dashboard_certificado_edit'),
 ]
 

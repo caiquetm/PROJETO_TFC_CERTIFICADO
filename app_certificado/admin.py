@@ -10,7 +10,7 @@ admin.site.register(Aluno, AlunooAdmin)
 
 
 class CertificadoAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'nome', 'instituicao', 'duracao', 'categoria', 'status', 'aluno' ]
 
 admin.site.register(Certificado, CertificadoAdmin)
 

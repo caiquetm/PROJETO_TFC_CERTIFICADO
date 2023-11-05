@@ -7,6 +7,6 @@
     {% csrf_token %}
     <button type="submit">Confirmar Exclusão</button>
   </form>
-  <a href="{% url 'app_certificado:lista_certificados' %}">Cancelar</a>
+  <a href="{% url 'app_certificado:lista_certificados' %}" class='back-link'>Cancelar</a>
 </div>
 {% endblock content %}

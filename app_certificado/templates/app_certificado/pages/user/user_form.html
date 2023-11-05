@@ -34,4 +34,13 @@
     </div>
 
     <a href="{% url 'app_certificado:user_list' %}" class="back-link">Voltar para a lista de usuários</a>
+    {% if messages %}
+    <div class="main-content center container messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 {% endblock content %}

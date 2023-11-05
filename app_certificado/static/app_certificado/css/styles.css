@@ -60,6 +60,10 @@ body {
     color: var(--color-dark-text);
 }
 
+img {
+    max-width: 100%;
+  }
+
 h1,
 h2,
 h3,
@@ -101,7 +105,7 @@ h6 {
     max-width: 64rem;
     margin: 0 auto;
     border-radius: .4rem;
-    position: relative;
+    position: inline;
     transition: all 300ms ease-in-out;
 }
 
@@ -460,4 +464,71 @@ a.cancel-link {
   
   .user-actions {
     text-align: right;
+  }
+
+  .users-dashboard-container{
+    max-width: 64rem;
+    text-align: left;
+    padding: var(--spacing-gutter-medium);
+    margin: 0 auto;
+  }
+
+  /* Messages */
+.messages-container {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: calc(var(--spacing-gutter-medium) / 2);
+  }
+  
+  .message {
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-dark-text);
+    background: var(--color-gray-2);
+    color: var(--color-dark-text);
+  }
+  
+  .message-error {
+    border: 1px solid var(--color-error-dark);
+    background: var(--color-error-light);
+    color: var(--color-error-dark);
+  }
+  
+  .message-success {
+    border: 1px solid var(--color-success-dark);
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+  }
+  
+  .message-warning {
+    border: 1px solid var(--color-warning-dark);
+    background: var(--color-warning-light);
+    color: var(--color-warning-dark);
+  }
+  
+  .message-alert {
+    border: 1px solid var(--color-alert-dark);
+    background: var(--color-alert-light);
+    color: var(--color-alert-dark);
+  }
+  
+  .message-info {
+    border: 1px solid var(--color-info-dark);
+    background: var(--color-info-light);
+    color: var(--color-info-dark);
+  }
+  
+  .message-debug {
+    border: 1px solid var(--color-debug-dark);
+    background: var(--color-debug-light);
+    color: var(--color-debug-dark);
+  }
+ 
+  .plaintext-button {
+    display: inline;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-primary);
+    font-size: 1.6rem;
   }

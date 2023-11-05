@@ -32,8 +32,7 @@ class CertificadoForm(forms.ModelForm):
 class CertificadoFormCriar(forms.ModelForm):
     class Meta:
         model = Certificado
-        fields = ['nome', 'instituicao', 'duracao', 'categoria', 'imagem', 'aluno', 'template']
-
+        fields = ['nome', 'instituicao', 'duracao', 'categoria','status', 'imagem', 'aluno', 'template']
 
 class UserFormCriar(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -115,13 +114,12 @@ class UserFormCriar(forms.ModelForm):
         password2 = cleaned_data.get('password2')  # Acesse 'password2' corretamente
 
         if password1 != password2:
-            raise forms.ValidationError('Senhas devem ser iguais')
+            #raise forms.ValidationError('Senhas devem ser iguais')
+            self.add_error('password1', 'Senhas devem ser iguais')
     
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2', 'is_staff']
-
-
 
 class UserFormEditar(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -166,7 +164,11 @@ class UserFormEditar(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'is_staff']
 
-
-
 class UserFormDeletar():
     ...
+
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(
+        widget = forms.PasswordInput()
+    )

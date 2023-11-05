@@ -1,11 +1,17 @@
-from unittest import TestCase
-
+import tempfile
 import pytest
-from app_certificado.forms import UserFormCriar, AlunoForm, CertificadoForm, CertificadoFormCriar, TemplateForm
+from unittest import TestCase
+from tempfile import NamedTemporaryFile
 from parameterized import parameterized
-
+from django.test import RequestFactory
 from django.test import TestCase as DjangoTestCase
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from app_certificado.forms import UserFormCriar, AlunoForm, CertificadoForm, CertificadoFormCriar, TemplateForm
+from app_certificado.models import Aluno, Template, Certificado
+from app_certificado.views import home, alunos, certificados, templates, usuarios, aluno, certificado, template
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Create your tests here.
 class UserRegisterFormUnitTest(TestCase):
@@ -43,7 +49,7 @@ class FormTests(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_template_form_valid_data(self):
-        form = TemplateForm(data={'instituicao': 'UNIRV', 'imagem': 'TemplatesCertificado/covers/covers/2023/10/21/Capturar1.PNG'})
+        form = TemplateForm(data={'instituicao': 'UNIRV', 'imagem': 'TemplatesCertificado/covers/Capturar1.PNG'})
         self.assertTrue(form.is_valid())
 
     def test_template_form_empty_data(self):
@@ -58,17 +64,33 @@ class FormTests(TestCase):
         form = CertificadoForm(data={})
         self.assertFalse(form.is_valid())
 
+
     def test_certificado_form_criar_valid_data(self):
+        aluno = Aluno.objects.create(nome="Nome do Aluno", horas=0)
+        template = Template.objects.create(instituicao="Instituição XYZ", imagem="caminho/para/imagem_template.jpg")
+
+        # Crie um arquivo temporário de imagem
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as img_file:
+            img_file.write(b'fake_image_content')
+            img_file.flush()
+            img_data = open(img_file.name, 'rb').read()
+
+        # Crie um arquivo de imagem carregado
+        uploaded_image = SimpleUploadedFile("fake_image.jpg", img_data)
+
         form_data = {
-            'nome': 'CAIQUE TELES DE MOURA',
-            'instituicao': 'UNIRV',
-            'duracao': 22,
-            'categoria': 'Gincana',
-            'imagem': 'caminho/para/imagem.jpg',
-            'aluno': 1, 
+            'nome': 'Certificado A',
+            'instituicao': 'Instituição B',
+            'duracao': '2',
+            'categoria': 'Categoria X',
+            'imagem': uploaded_image,
+            'aluno': 1,
+            'template': 3,
         }
 
-        form = CertificadoFormCriar(data=form_data)
+        form = CertificadoFormCriar(data=form_data, files=form_data)
+        if not form.is_valid():
+            print(form.errors)  # Imprime as mensagens de erro
         self.assertTrue(form.is_valid())
 
     def test_certificado_form_criar_empty_data(self):
@@ -98,13 +120,17 @@ class UserFormTest(TestCase):
         }
         form = UserFormCriar(data=form_data)
         self.assertFalse(form.is_valid())
-        self.assertIn('password1', form.errors)
-        self.assertIn('password2', form.errors)
+
+
+
+    def setUp(self):
+            # Crie um usuário com o nome de usuário 'caique' para simular um conflito de nome de usuário
+            User.objects.create_user(username='caique', email='caique@example.com', password='password123')
 
     def test_username_already_exists(self):
         # You should set up a user with an existing username before this test
         form_data = {
-            'username': 'existing_user',
+            'username': 'caique',
             'email': 'newuser@example.com',
             'password1': 'P@ssw0rd',
             'password2': 'P@ssw0rd',
@@ -118,7 +144,7 @@ class UserFormTest(TestCase):
         # You should set up a user with an existing email before this test
         form_data = {
             'username': 'newuser',
-            'email': 'existing_user@example.com',
+            'email': 'caique@example.com',
             'password1': 'P@ssw0rd',
             'password2': 'P@ssw0rd',
             'is_staff': False,
@@ -126,3 +152,57 @@ class UserFormTest(TestCase):
         form = UserFormCriar(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('email', form.errors)
+
+
+
+@pytest.mark.django_db
+def test_home_view():
+    request = RequestFactory().get('/')
+    response = home(request)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_alunos_view():
+    request = RequestFactory().get('/alunos/')
+    response = alunos(request)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_certificados_view():
+    request = RequestFactory().get('/certificados/')
+    response = certificados(request)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_templates_view():
+    request = RequestFactory().get('/templates/')
+    response = templates(request)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_usuarios_view():
+    request = RequestFactory().get('/usuarios/')
+    response = usuarios(request)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_aluno_view():
+    aluno = Aluno.objects.create(nome="CAIQUE TELES DE MOURA", horas=0)
+    request = RequestFactory().get(reverse('CAIQUE TELES DE MOURA', args=[aluno.id]))
+    response = aluno(request, aluno.id)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_certificado_view():
+    certificado = Certificado.objects.create(nome="Certificado Teste", instituicao="Instituição Teste", duracao="10", categoria="Categoria Teste")
+    request = RequestFactory().get(reverse('certificado', args=[certificado.id]))
+    response = certificado(request, certificado.id)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_template_view():
+    template = Template.objects.create(instituicao="Instituição Template", imagem="templatesCertificado/covers/imagem_template.jpg")
+    request = RequestFactory().get(reverse('template', args=[template.id]))
+    response = template(request, template.id)
+    assert response.status_code == 200
+

@@ -23,7 +23,7 @@ class Aluno(models.Model):
 
 class Template(models.Model):
     instituicao = models.CharField(max_length=65)
-    imagem = models.ImageField(upload_to='TemplatesCertificado/covers/%Y/%m/%d')
+    imagem = models.ImageField(upload_to='TemplatesCertificado/covers')
 
     def __str__(self):
         return self.instituicao
@@ -35,7 +35,7 @@ class Certificado(models.Model):
     duracao = models.CharField(max_length=65)
     categoria = models.CharField(max_length=1000)
     status = models.BooleanField(default=False)
-    imagem = models.ImageField(upload_to='certificados/covers/%Y/%m/%d')
+    imagem = models.ImageField(upload_to='certificados/covers')
     aluno = models.ForeignKey(
         Aluno, on_delete=models.SET_NULL, null=True)
     template = models.ForeignKey(

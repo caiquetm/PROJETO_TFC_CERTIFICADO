@@ -1,12 +1,14 @@
 
 from django.http import Http404
+from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, get_user_model, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Aluno, Template, Certificado
-from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar
+from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCriar, LoginForm, UserFormCriar, UserFormEditar
 import pytesseract
 from PIL import Image
 
@@ -144,10 +146,6 @@ def inativar_template(request, template_id):
 
 
 #CRUD User--------------------------------------------------------------------------------------------------------------------------
-from django.contrib.auth import get_user_model
-from django.urls import reverse_lazy
-from .forms import UserFormCriar, UserFormEditar
-
 class UserCreateView(CreateView):
     model = get_user_model()
     template_name = 'app_certificado/pages/user/user_form.html'
@@ -203,11 +201,6 @@ def novo_usuario_criar(request):
 
     return redirect('app_certificado:user_register')
 
-
-
-
-
-
 def usuario_editar(request, user_id):
     
     user = User.objects.get(pk=user_id)
@@ -238,6 +231,65 @@ def usuario_excluir(request, user_id):
         return redirect('app_certificado:user_list')  # Redirecione para a lista de usuários após a exclusão
 
     return render(request, 'app_certificado/pages/user/user_confirm_delete.html', {'user': user})
+
+from django.contrib.auth import authenticate, login as auth_login  # Renomeie a função 'login'
+
+def user_login(request):
+    form = LoginForm()
+    return render(request, 'app_certificado/pages/user/login.html', {
+        'form': form,
+        'form_action': reverse('app_certificado:login_create')
+    })
+
+def login_create(request):
+    if not request.POST:
+        raise Http404()
+
+    form = LoginForm(request.POST)
+
+    if form.is_valid():
+        authenticated_user = authenticate(
+            username=form.cleaned_data.get('username', ''),
+            password=form.cleaned_data.get('password', '')
+        )
+        if authenticated_user is not None:
+            messages.success(request, 'Logado com sucesso')
+            auth_login(request, authenticated_user)
+        else:
+            messages.error(request, 'Credenciais Inválidas')
+    else:
+        messages.error(request, 'Erro ao validar dados')
+
+    return redirect(reverse('app_certificado:dashboard'))
+
+@login_required(login_url='app_certificado:login', redirect_field_name='next')
+def user_logout(request):
+    if not request.POST:
+        return redirect(reverse('app_certificado:login'))
+    
+    logout(request)
+    return redirect(reverse('app_certificado:login'))
+
+@login_required(login_url='app_certificado:login', redirect_field_name='next')
+def dashboard(request):
+    certificados = Certificado.objects.filter(
+        status = False,
+    )
+    return render(request, 'app_certificado/pages/user/dashboard.html', {
+        'certificados': certificados,
+    })
+
+@login_required(login_url='app_certificado:login', redirect_field_name='next')
+def dashboard_certificado_edit(request, certificado_id):
+    certificado = get_object_or_404(Certificado, id=certificado_id)
+    if request.method == 'POST':
+        form = CertificadoFormCriar(request.POST, request.FILES, instance=certificado)
+        if form.is_valid():
+            form.save()
+            return redirect('app_certificado:dashboard')
+    else:
+        form = CertificadoFormCriar(instance=certificado)
+    return render(request, 'app_certificado/pages/user/dashboard_certificado.html', {'form': form})
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -292,11 +344,17 @@ def enviar_certificado(request):
 
 
                 #linhas = texto_extraido.split('\n')
-                # Processar o texto extraído e inserir nos campos do Certificado
-                #certificado.nome = linhas[6].upper()
-                #certificado.instituicao = linhas[2]
-                #certificado.categoria = linhas[7]
-                # certificado.duracao = ...  
+                # certificado.nome = linhas[6].upper()
+                # certificado.instituicao = linhas[2]
+                # certificado.categoria = linhas[7]
+
+                # Verifica se a palavra 'UNIRV' está no texto_extraido
+                if 'UNIRV' in certificado.instituicao:
+                    try:
+                        template = Template.objects.get(instituicao__iexact='UNIRV')
+                        certificado.template = template
+                    except Template.DoesNotExist:
+                        print("Instituição 'UNIRV' não encontrada no banco de dados")   
                 # Buscar o aluno no banco de dados
                 try:
                     aluno = Aluno.objects.get(nome=certificado.nome)

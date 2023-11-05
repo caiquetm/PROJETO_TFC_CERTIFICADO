@@ -1,0 +1,45 @@
+{% extends "global/base.html" %}
+
+{% block title %}Dashboard {{user}} {% endblock title %}
+
+{% block content %}
+  
+  {% if request.user.is_authenticated %}
+  <div>
+    <h1>Dashboard de {{user}}.</h1> 
+    <form class="form" action=" {% url 'app_certificado:user_logout' %} " method='POST'>
+      {% csrf_token %}
+      <button class="button" type="submit">Log out</button>
+    </form>
+
+    <div class="users-dashboard-container">
+      <h2>Certificados</h2>
+      <ul>
+        {% for certificado in certificados %}
+          <li>
+            <div class="certificado-actions">
+              <a href=" {% url 'app_certificado:dashboard_certificado_edit' certificado.id %}"> {{certificado.nome}} 
+                - {{ certificado.duracao }} Horas - {{ certificado.categoria }}</a>
+            </div>
+          </li>
+        {% empty %}
+          <li>
+            <p>Nâo há certificados pendentes de validação</p>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if messages %}
+    <div class="main-content center container messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+  
+{% endblock content %}

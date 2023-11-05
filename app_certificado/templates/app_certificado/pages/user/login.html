@@ -1,0 +1,45 @@
+{% extends "global/base.html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+  <h1>Login</h1>
+
+  {% if request.user.is_authenticated %}
+  <div>
+    <h1>Logado como {{request.user.username}}.</h1> 
+    <form class="form" action=" {% url 'app_certificado:user_logout' %} " method='POST'>
+      {% csrf_token %}
+      <button class="button" type="submit">Log out</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if not user.is_authenticated %}
+  <div class='main-content container'>  
+        <form action=" {% url 'app_certificado:login_create' %} " method='POST'>
+        {% csrf_token %}
+        <div class="form-content form-content-grid">
+            {% for field in form %}
+                <div class="form-group">
+                  <label for="{{ field.id_for_label }}"> {{field.label}} </label>
+                  {{field}}
+                </div>
+            {% endfor %}
+        </div>
+      <button type="submit" class="button">Login</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if messages %}
+    <div class="main-content center container messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+  
+{% endblock content %}

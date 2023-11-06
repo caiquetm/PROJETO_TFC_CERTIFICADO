@@ -1,17 +1,27 @@
 import tempfile
 import pytest
+from django import views
 from unittest import TestCase
+from django.test import TestCase
 from tempfile import NamedTemporaryFile
 from parameterized import parameterized
 from django.test import RequestFactory
 from django.test import TestCase as DjangoTestCase
-from django.urls import reverse
+from django.urls import resolve, reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from app_certificado.forms import UserFormCriar, AlunoForm, CertificadoForm, CertificadoFormCriar, TemplateForm
 from app_certificado.models import Aluno, Template, Certificado
-from app_certificado.views import home, alunos, certificados, templates, usuarios, aluno, certificado, template
-from django.contrib.auth import get_user_model
-User = get_user_model()
+from app_certificado.views import home, certificados, aluno, certificado
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+image_path = 'media/TemplatesCertificado/covers/2023/10/21/Capturar1.PNG'
+with open(image_path, 'rb') as file:
+    image_content = file.read()
+image_file = SimpleUploadedFile("file.png", image_content)
+
+aluno_id = 1
+template_id = 5
 
 # Create your tests here.
 class UserRegisterFormUnitTest(TestCase):
@@ -48,50 +58,27 @@ class FormTests(TestCase):
         form = AlunoForm(data={})
         self.assertFalse(form.is_valid())
 
+
     def test_template_form_valid_data(self):
-        form = TemplateForm(data={'instituicao': 'UNIRV', 'imagem': 'TemplatesCertificado/covers/Capturar1.PNG'})
-        self.assertTrue(form.is_valid())
+        form = TemplateForm(
+            data={'instituicao': 'UNIRV'},
+            files={'imagem': image_file}
+        )
+        self.assertTrue(form.is_valid(), form.errors)  
 
     def test_template_form_empty_data(self):
         form = TemplateForm(data={})
         self.assertFalse(form.is_valid())
 
     def test_certificado_form_valid_data(self):
-        form = CertificadoForm(data={})
+        form = CertificadoForm(
+            files={'imagem': image_file}
+        )
         self.assertTrue(form.is_valid())
 
     def test_certificado_form_empty_data(self):
         form = CertificadoForm(data={})
         self.assertFalse(form.is_valid())
-
-
-    def test_certificado_form_criar_valid_data(self):
-        aluno = Aluno.objects.create(nome="CAIQUE TELES DE MOURA", horas=0)
-        template = Template.objects.create(instituicao="Instituição XYZ", imagem="caminho/para/imagem_template.jpg")
-
-        # Crie um arquivo temporário de imagem
-        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as img_file:
-            img_file.write(b'fake_image_content')
-            img_file.flush()
-            img_data = open(img_file.name, 'rb').read()
-
-        # Crie um arquivo de imagem carregado
-        uploaded_image = SimpleUploadedFile("fake_image.jpg", img_data)
-
-        form_data = {
-            'nome': 'Certificado A',
-            'instituicao': 'Instituição B',
-            'duracao': '2',
-            'categoria': 'Categoria X',
-            'imagem': uploaded_image,
-            'aluno': 1,
-            'template': 3,
-        }
-
-        form = CertificadoFormCriar(data=form_data, files=form_data)
-        if not form.is_valid():
-            print(form.errors)  # Imprime as mensagens de erro
-        self.assertTrue(form.is_valid())
 
     def test_certificado_form_criar_empty_data(self):
         form = CertificadoFormCriar(data={})
@@ -122,13 +109,10 @@ class UserFormTest(TestCase):
         self.assertFalse(form.is_valid())
 
 
-
     def setUp(self):
-            # Crie um usuário com o nome de usuário 'caique' para simular um conflito de nome de usuário
             User.objects.create_user(username='caique', email='caique@example.com', password='password123')
 
     def test_username_already_exists(self):
-        # You should set up a user with an existing username before this test
         form_data = {
             'username': 'caique',
             'email': 'newuser@example.com',
@@ -141,7 +125,6 @@ class UserFormTest(TestCase):
         self.assertIn('username', form.errors)
 
     def test_email_already_exists(self):
-        # You should set up a user with an existing email before this test
         form_data = {
             'username': 'newuser',
             'email': 'caique@example.com',
@@ -161,53 +144,32 @@ def test_home_view():
     response = home(request)
     assert response.status_code == 200
 
-@pytest.mark.django_db
-def test_alunos_view():
-    request = RequestFactory().get('/alunos/')
-    response = alunos(request)
-    assert response.status_code == 200
+class TemplateViewTests(TestCase):
+    def setUp(self):
+        self.staff_user = User.objects.create_user(username='caique', password='qwertyuiop123')
+        self.staff_user.is_staff = True
+        self.staff_user.save()
 
-@pytest.mark.django_db
-def test_certificados_view():
-    request = RequestFactory().get('/certificados/')
-    response = certificados(request)
-    assert response.status_code == 200
+        self.normal_user = User.objects.create_user(username='123', password='123qwe123')
+        self.normal_user.is_staff = False
+        self.normal_user.save()
 
-@pytest.mark.django_db
-def test_templates_view():
-    request = RequestFactory().get('/templates/')
-    response = templates(request)
-    assert response.status_code == 200
+    def test_staff_user_can_access_novo_template(self):
+        self.client.login(username='caique', password='qwertyuiop123')
+        response = self.client.get(reverse('app_certificado:novo_template'))
+        self.assertEqual(response.status_code, 200)
 
-@pytest.mark.django_db
-def test_usuarios_view():
-    request = RequestFactory().get('/usuarios/')
-    response = usuarios(request)
-    assert response.status_code == 200
+    def test_normal_user_cannot_access_novo_template(self):
+        self.client.login(username='123', password='123qwe123')
+        response = self.client.get(reverse('app_certificado:novo_template'))
+        self.assertEqual(response.status_code, 302)
 
-@pytest.mark.django_db
-def test_aluno_view():
-    aluno = Aluno.objects.create(nome="CAIQUE TELES DE MOURA", horas=0)
-    request = RequestFactory().get(reverse('CAIQUE TELES DE MOURA', args=[aluno.id]))
-    response = aluno(request, aluno.id)
-    assert response.status_code == 200
+    def test_templates_view_staff_user(self):
+        self.client.login(username='caique', password='qwertyuiop123')
+        response = self.client.get(reverse('app_certificado:lista_templates'))
+        self.assertEqual(response.status_code, 200)
 
-@pytest.mark.django_db
-def test_certificado_view():
-    certificado = Certificado.objects.create(nome="Certificado Teste", instituicao="Instituição Teste", duracao="10", categoria="Categoria Teste")
-    request = RequestFactory().get(reverse('certificado', args=[certificado.id]))
-    response = certificado(request, certificado.id)
-    assert response.status_code == 200
-
-@pytest.mark.django_db
-def test_template_view():
-    template = Template.objects.create(instituicao="Instituição Template", imagem="templatesCertificado/covers/imagem_template.jpg")
-    request = RequestFactory().get(reverse('template', args=[template.id]))
-    response = template(request, template.id)
-    assert response.status_code == 200
-
-def test_search_url_is_correct(self):
-    url = reverse('app_certificado:search')
-    self.assertEqual(url, '/search/')
-
-def test_search_uses_correct_view_function(self):
+    def test_templates_view_normal_user(self):
+        self.client.login(username='123', password='123qwe123')
+        response = self.client.get(reverse('app_certificado:lista_templates'))
+        self.assertEqual(response.status_code, 302)

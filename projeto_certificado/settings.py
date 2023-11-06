@@ -144,3 +144,5 @@ AUTH_USER_MODEL = 'auth.User'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'app_certificado:home'
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'

@@ -5,11 +5,12 @@
 {% block content %}
 
 <h1>Confirmar Exclusão</h1>
+<div class='main-content container'>
 <p>Tem certeza de que deseja excluir o usuário "{{ user.username }}"?</p>
-<form method="post">
+<form class="form-certificados" method="post">
     {% csrf_token %}
     <button type="submit">Confirmar Exclusão</button>
 </form>
 <a href="{% url 'app_certificado:user_list' %}" class="back-link" >Cancelar</a>
-
+</div>
 {% endblock content %}

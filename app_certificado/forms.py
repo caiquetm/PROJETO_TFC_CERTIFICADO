@@ -32,7 +32,7 @@ class CertificadoForm(forms.ModelForm):
 class CertificadoFormCriar(forms.ModelForm):
     class Meta:
         model = Certificado
-        fields = ['nome', 'instituicao', 'duracao', 'categoria','status', 'imagem', 'aluno', 'template']
+        fields = ['nome', 'instituicao', 'duracao', 'categoria','status', 'aluno', 'template', 'imagem']
 
 class UserFormCriar(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -165,9 +165,6 @@ class UserFormEditar(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'is_staff']
-
-class UserFormDeletar():
-    ...
 
 class LoginForm(forms.Form):
     username = forms.CharField()

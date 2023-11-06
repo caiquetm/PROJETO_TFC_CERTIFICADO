@@ -8,7 +8,7 @@
   {% if request.user.is_authenticated %}
   <div>
     <h1>Logado como {{request.user.username}}.</h1> 
-    <form class="form" action=" {% url 'app_certificado:user_logout' %} " method='POST'>
+    <form class="form-certificados" action=" {% url 'app_certificado:user_logout' %} " method='POST'>
       {% csrf_token %}
       <button class="button" type="submit">Log out</button>
     </form>

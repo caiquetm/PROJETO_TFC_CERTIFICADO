@@ -12,13 +12,16 @@
     <div class="users-dashboard-container">
     {% for template in templates %}
         <li>
+            <div class="certificado-info">  
+                <div class="certificado-actions">
             {{ template.instituicao }}
             <a href="{% url 'app_certificado:editar_template' template.id %}" class="edit-link">Editar</a> 
             <a href="{% url 'app_certificado:inativar_template' template.id %}" class="inactivate-link">Inativar</a>
+        </div></div>
         </li>
     {% endfor %}
     </div>
+    <a href="{% url 'app_certificado:novo_template' %}" class="add-link">Adicionar Novo Template</a>
 </ul>
-<a href="{% url 'app_certificado:novo_template' %}" class="add-link">Adicionar Novo Template</a>
 
 {% endblock content %}

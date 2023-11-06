@@ -5,11 +5,13 @@
 {% block content %}
 
 <h1>Inativar Aluno</h1>
+<ul>
     <p>Tem certeza de que deseja inativar o aluno "{{ aluno.nome }}"?</p>
     <form class="form-certificados" method="post">
         {% csrf_token %}
         <button type="submit">Sim, Inativar</button>
     </form>
     <a href="{% url 'app_certificado:lista_alunos' %}" class="back-link">Cancelar</a>
+</ul>
 
 {% endblock content %}

@@ -5,11 +5,13 @@
 {% block content %}
 
 <h1>Novo Template</h1>
-<form method="post" enctype="multipart/form-data">
+<div class='main-content container'>
+<form class="form-certificados" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Salvar</button>
 </form>
 <a href="{% url 'app_certificado:lista_templates' %}" class="back-link">Voltar para a Lista de Templates</a>
+</div>
 
 {% endblock content %}

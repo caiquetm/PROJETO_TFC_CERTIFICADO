@@ -32,7 +32,7 @@ class Template(models.Model):
 class Certificado(models.Model):
     nome = models.CharField(max_length=65)
     instituicao = models.CharField(max_length=65)
-    duracao = models.CharField(max_length=65)
+    duracao = models.IntegerField(default=0)
     categoria = models.CharField(max_length=1000)
     status = models.BooleanField(default=False)
     imagem = models.ImageField(upload_to='certificados/covers')

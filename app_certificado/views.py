@@ -1,5 +1,5 @@
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from django.contrib import messages
@@ -12,9 +12,6 @@ from .forms import AlunoForm, TemplateForm, CertificadoForm, CertificadoFormCria
 import pytesseract
 from PIL import Image
 from django.db.models import Q
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-
 
 # Create your views here.
 def is_staff(user):
@@ -68,6 +65,12 @@ def novo_aluno(request):
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def editar_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
+    certificados = Certificado.objects.filter(aluno=aluno)
+
+    if certificados.exists():
+        lista_alunos_url = reverse('app_certificado:lista_alunos')
+        return HttpResponse(f"Não é possível editar este aluno, pois existem certificados associados a ele. <a href='{lista_alunos_url}'>Voltar para a lista de alunos</a>")
+    
     if request.method == 'POST':
         form = AlunoForm(request.POST, instance=aluno)
         if form.is_valid():
@@ -80,6 +83,12 @@ def editar_aluno(request, aluno_id):
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def excluir_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
+    certificados = Certificado.objects.filter(aluno=aluno)
+
+    if certificados.exists():
+        lista_alunos_url = reverse('app_certificado:lista_alunos')
+        return HttpResponse(f"Não é possível excluir este aluno, pois existem certificados associados a ele. <a href='{lista_alunos_url}'>Voltar para a lista de alunos</a>")
+
     if request.method == 'POST':
         aluno.delete()
         return redirect('app_certificado:lista_alunos')
@@ -88,6 +97,12 @@ def excluir_aluno(request, aluno_id):
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def inativar_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
+    certificados = Certificado.objects.filter(aluno=aluno)
+
+    if certificados.exists():
+        lista_alunos_url = reverse('app_certificado:lista_alunos')
+        return HttpResponse(f"Não é possível inativar este aluno, pois existem certificados associados a ele. <a href='{lista_alunos_url}'>Voltar para a lista de alunos</a>")
+
     if request.method == 'POST':
         aluno.status = True
         aluno.save()
@@ -125,6 +140,12 @@ def novo_template(request):
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def editar_template(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
+    certificados = Certificado.objects.filter(template=template)
+
+    if certificados.exists():
+        lista_templates_url = reverse('app_certificado:lista_templates')
+        return HttpResponse(f"Não é possível editar este template, pois existem certificados associados a ele. <a href='{lista_templates_url}'>Voltar para a lista de templates</a>")
+
     if request.method == 'POST':
         form = TemplateForm(request.POST, request.FILES, instance=template)
         if form.is_valid():
@@ -137,9 +158,16 @@ def editar_template(request, template_id):
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def inativar_template(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
+    certificados = Certificado.objects.filter(template=template)
+
+    if certificados.exists():
+        lista_templates_url = reverse('app_certificado:lista_templates')
+        return HttpResponse(f"Não é possível inativar este template, pois existem certificados associados a ele. <a href='{lista_templates_url}'>Voltar para a lista de templates</a>")
+
     if request.method == 'POST':
         template.delete()
         return redirect('app_certificado:lista_templates')
+
     return render(request, 'app_certificado/pages/templateCertificado/inativar_template.html', {'template': template})
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -430,12 +458,23 @@ def excluir_certificado(request, certificado_id):
         return redirect('app_certificado:lista_certificados')
     return render(request, 'app_certificado/pages/certificado/excluir_certificado.html', {'certificado': certificado})
 
-def search_certificados(request):
-    query = request.GET.get('search', '')
-    certificados = Certificado.objects.filter(Q(instituicao__icontains=query) | Q(nome__icontains=query))
 
-    return render(request, 'app_certificado/pages/certificado/search_results.html', {
-        'certificados': certificados,
-        'query': query,
+#SEARCH--------------------------------------------------
+def search(request):
+    search_term = request.GET.get('q', '').strip()
+
+    if not search_term:
+        raise Http404()
+    
+    certificado = Certificado.objects.filter(
+        Q(nome__contains=search_term) |
+        Q(instituicao__contains=search_term) |
+        Q(duracao__contains=search_term) |
+        Q(categoria__contains=search_term),
+    ).order_by('-id')
+
+    return render(request, 'app_certificado/pages/search.html', {
+        'page_title': f'Search for "{search_term}"',
+        'certificados': certificado,
     })
 #-----------------------------------------------------------------------------------------------------------------------------------

@@ -25,12 +25,10 @@
             </li>
         {% endfor %}
     </div>
-</ul>
+    {% csrf_token %}
 
-{% csrf_token %}
-
-<a href="{% url 'app_certificado:novo_aluno' %}" class="back-link">Adicionar Novo Aluno</a>
-
+    <a href="{% url 'app_certificado:novo_aluno' %}" class="back-link">Adicionar Novo Aluno</a>
+    </ul>
 </div>
 
 {% endblock content %}

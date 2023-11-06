@@ -5,11 +5,15 @@
 {% block content %}
 
 <h1>Editar Aluno</h1>
-<form class="form-certificados" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
-<a href="{% url 'app_certificado:lista_alunos' %}" class="back-link">Voltar para a Lista de Alunos</a>
+
+<ul>
+    <form class="form-certificados" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Salvar</button>
+    </form>
+    <a href="{% url 'app_certificado:lista_alunos' %}" class="back-link">Voltar para a Lista de Alunos</a>
+    
+</ul>
 
 {% endblock content %}

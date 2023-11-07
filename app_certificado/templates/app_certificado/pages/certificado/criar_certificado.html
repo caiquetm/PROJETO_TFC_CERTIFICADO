@@ -1,7 +1,9 @@
 {% extends "global/base.html" %}
 
 {% block content %}
-  <h1>Criar Certificado</h1>
+  
+  <div class="users-dashboard-container">
+    <h1>Criar Certificado</h1>
         <div class='main-content container'>
           <form class="form-certificados" method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -28,6 +30,6 @@
           </form>
       </div>
 
-  <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Voltar para a lista de certificados</a>
+  <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Cancelar</a>
 </div>
 {% endblock content %}

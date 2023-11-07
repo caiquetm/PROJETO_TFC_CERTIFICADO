@@ -3,21 +3,29 @@
 {% block title %} {{ certificado.title }} {% endblock title %}
 
 {% block content %}
-
-<form class="form-certificados" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Enviar Certificado</button>
-</form>
-<a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Voltar para a lista de certificados</a>
-{% if messages %}
-<div class="main-content center container messages-container">
-    {% for message in messages %}
-        <div class="message {{ message.tags }}">
-            {{ message }}
-        </div>
-    {% endfor %}
+<div class="users-dashboard-container">
+    <form class="form-certificados" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Enviar Certificado</button>
+    </form>
+    
+    {% if user.is_staff %}
+        <a href="{% url 'app_certificado:lista_certificados' %}" class="back-link">Cancelar</a>
+    {% else %}
+        <a href="{% url 'app_certificado:home' %}" class="back-link">Voltar para a Home</a>
+    {% endif %}
+    
+    {% if messages %}
+    <div class="main-content center container messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
-{% endif %}
+
 
 {% endblock content %}

@@ -11,7 +11,7 @@ from django.urls import resolve, reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from app_certificado.forms import UserFormCriar, AlunoForm, CertificadoForm, CertificadoFormCriar, TemplateForm
 from app_certificado.models import Aluno, Template, Certificado
-from app_certificado.views import home, certificados, aluno, certificado
+from app_certificado.views import enviar_certificado, home, certificados, aluno, certificado
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 

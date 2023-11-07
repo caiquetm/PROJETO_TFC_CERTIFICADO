@@ -16,7 +16,7 @@
   {% endif %}
 
   {% if not user.is_authenticated %}
-  <div class='main-content container'>  
+  <div class="form-certificados">  
         <form action=" {% url 'app_certificado:login_create' %} " method='POST'>
         {% csrf_token %}
         <div class="form-content form-content-grid">

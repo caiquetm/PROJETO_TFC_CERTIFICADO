@@ -10,11 +10,18 @@ urlpatterns = [
     path('', views.home, name="home"),
 
     path('search/', views.search, name="search"),
+    path('search/alunos/', views.search_alunos, name="search_alunos"),
+    path('search/certificados/', views.search_certificados, name="search_certificados"),
+    path('search/usuarios/', views.search_usuarios, name="search_usuarios"),
+    path('search/templates/', views.search_templates, name="search_templates"),
+
     path('users/list/', views.user_list, name="user_list"),
     path('users/register/', views.novo_usuario, name="user_register"),
     path('users/register/create/', views.novo_usuario_criar, name="user_create"),
     path('users/edit/<int:user_id>/', views.usuario_editar, name="user_edit"),
     path('users/delete/<int:user_id>/', views.usuario_excluir, name="user_delete"),
+    path('users/inactivate/<int:user_id>/', views.inactivate_user, name='user_inactivate'),
+    path('users/activate/<int:user_id>/', views.activate_user, name='user_activate'),
 
 
     #path('', views.usuario, name="usuario"),
@@ -41,11 +48,12 @@ urlpatterns = [
     path('certificados/<int:certificado_id>/', views.ver_certificado, name="ver_certificado"),
     path('certificados/<int:certificado_id>/atualizar/', views.atualizar_certificado, name="atualizar_certificado"),
     path('certificados/<int:certificado_id>/excluir/', views.excluir_certificado, name="excluir_certificado"),
-
+    
     path('login/', views.user_login, name="login"),
     path('login/create/', views.login_create, name="login_create"),
     path('logout/', views.user_logout, name="user_logout"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('dashboard/certificado/<int:certificado_id>/edit', views.dashboard_certificado_edit, name="dashboard_certificado_edit"),
+    path('dashboard/certificado/<int:certificado_id>/activate', views.activate_certificado, name='activate_certificado'),
 ]
 

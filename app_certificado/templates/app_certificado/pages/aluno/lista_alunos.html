@@ -1,22 +1,21 @@
 {% extends "global/base.html" %}
 
-{% block title %} {{ aluno.title }} {% endblock title %}
+{% block title %} {{ title }} {% endblock title %}
 
 {% block content %}
-
-   
+{% include 'app_certificado/pages/aluno/search.html' %}
 <h1>Lista de Alunos</h1>
-<ul>
-    <div class="users-dashboard-container">
+<div class="users-dashboard-container">
+    <ul>
         {% for aluno in alunos %}
             <li>
                 <div class="certificado-info">  
                     <div class="certificado-actions">
-                        {{ aluno.nome }} - {{ aluno.horas }} horas
                         {% if aluno.status %}
-                            <span style="color: red;">(Inativo)</span>
+                            <span style="color: red;">{{ aluno.nome }} - {{ aluno.horas }} horas</span>
                             <a href="{% url 'app_certificado:ativar_aluno' aluno.id %}" class="activate-link">Ativar</a>
                         {% else %}
+                            {{ aluno.nome }} - {{ aluno.horas }} horas
                             <a href="{% url 'app_certificado:inativar_aluno' aluno.id %}" class="inactivate-link">Inativar</a>
                         {% endif %}
                         <a href="{% url 'app_certificado:editar_aluno' aluno.id %}" class="edit-link">Editar</a>
@@ -24,12 +23,9 @@
                 </div>
             </li>
         {% endfor %}
-    </div>
-    {% csrf_token %}
-
-    <a href="{% url 'app_certificado:novo_aluno' %}" class="back-link">Adicionar Novo Aluno</a>
     </ul>
+    {% csrf_token %}
+    <a href="{% url 'app_certificado:novo_aluno' %}" class="back-link">Adicionar Novo Aluno</a>
 </div>
 
 {% endblock content %}
-

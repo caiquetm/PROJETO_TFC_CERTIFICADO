@@ -3,8 +3,9 @@
 {% block title %} {{ certificado.title }} {% endblock title %}
 
 {% block content %}
-
+<div class="users-dashboard-container">
     <h1>Envio de Certificado Bem-sucedido</h1>
     <p>Seu certificado de horas complementares foi enviado com sucesso. Obrigado!</p>
     <a href="{% url 'app_certificado:enviar_certificado' %}" class="back-link">Enviar outro certificado</a>
+</div>
 {% endblock content %}

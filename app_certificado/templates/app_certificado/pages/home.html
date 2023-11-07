@@ -3,7 +3,7 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
-
+{% include 'app_certificado/partials/search.html' %}
 <div class="main-content main-content-list container">
   {% for certificado in certificados %}
     {% include 'app_certificado/partials/certificado.html' %}

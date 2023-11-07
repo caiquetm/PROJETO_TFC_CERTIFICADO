@@ -5,7 +5,7 @@
 {% block content %}
   
   {% if request.user.is_authenticated %}
-  <div>
+  <div class="users-dashboard-container">
     <h1>Dashboard de {{user}}.</h1> 
 
 
@@ -15,13 +15,17 @@
         {% for certificado in certificados %}
           <li>
             <div class="certificado-actions">
-              <a href=" {% url 'app_certificado:dashboard_certificado_edit' certificado.id %}"> {{certificado.nome}} 
+              <form method="post" action="{% url 'app_certificado:activate_certificado' certificado.id %}">
+                {% csrf_token %}
+                <button type="submit" class="activate-button">Ativar</button>
+              </form>
+              <a href="{% url 'app_certificado:dashboard_certificado_edit' certificado.id %}"> {{certificado.nome}} 
                 - {{ certificado.duracao }} Horas - {{ certificado.categoria }}</a>
             </div>
           </li>
         {% empty %}
           <li>
-            <p>Nâo há certificados pendentes de validação</p>
+            <p>Não há certificados pendentes de validação</p>
           </li>
         {% endfor %}
       </ul>

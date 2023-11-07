@@ -1,5 +1,5 @@
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_list_or_404, get_object_or_404
 from django.contrib import messages
@@ -248,6 +248,26 @@ def usuario_excluir(request, user_id):
 
     return render(request, 'app_certificado/pages/user/user_confirm_delete.html', {'user': user})
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
+def inactivate_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    
+    # Marque o usuário como inativo
+    user.is_active = False
+    user.save()
+    
+    return HttpResponseRedirect(reverse('app_certificado:user_list'))
+
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
+def activate_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    
+    # Marque o usuário como ativo
+    user.is_active = True
+    user.save()
+    
+    return HttpResponseRedirect(reverse('app_certificado:user_list'))
+
 def user_login(request):
     form = LoginForm()
     return render(request, 'app_certificado/pages/user/login.html', {
@@ -406,9 +426,20 @@ def enviar_certificado(request):
         form = CertificadoForm()
     return render(request, 'app_certificado/pages/certificado/enviar_certificado.html', {'form': form})
 
+@login_required(login_url='app_certificado:login', redirect_field_name='next')
+def activate_certificado(request, certificado_id):
+    certificado = get_object_or_404(Certificado, pk=certificado_id)
+    
+    if request.method == 'POST':
+        certificado.status = True
+        certificado.save()
+    
+    return redirect('app_certificado:dashboard')
+
 def sucesso(request):
     return render(request, 'app_certificado/pages/certificado/sucesso.html')
 
+@user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def lista_certificados(request):
     certificados = Certificado.objects.all()
     return render(request, 'app_certificado/pages/certificado/lista_certificados.html', {'certificados': certificados})
@@ -428,15 +459,6 @@ def criar_certificado(request):
 def ver_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id)
     return render(request, 'app_certificado/pages/certificado/ver_certificado.html', {'certificado': certificado})
-
-def search_certificados(request):
-    if request.method == 'GET':
-        query = request.GET.get('search', '')  # Obtém o termo de pesquisa do formulário
-        certificados = Certificado.objects.filter(aluno__nome__icontains=query)
-        
-        return render(request, 'search.html', {'certificados': certificados, 'search_query': query})
-
-    return render(request, 'lista_certificados.html')
 
 @user_passes_test(is_staff, login_url='app_certificado:login', redirect_field_name='next')
 def atualizar_certificado(request, certificado_id):
@@ -476,5 +498,78 @@ def search(request):
     return render(request, 'app_certificado/pages/search.html', {
         'page_title': f'Search for "{search_term}"',
         'certificados': certificado,
+    })
+
+def search_alunos(request):
+    search_term = request.GET.get('q', '').strip()
+    search_type = request.GET.get('type', '')  # Obtém o tipo de pesquisa (ativos, inativos, todos)
+
+    if search_type == 'todos':
+        if not search_term:
+            alunos = Aluno.objects.all()  # Busca todos os alunos, ativos e inativos
+        else:
+            alunos = Aluno.objects.filter(Q(nome__icontains=search_term) |
+        Q(horas__contains=search_term))
+    elif search_type == 'inativos':
+        alunos = Aluno.objects.filter(Q(nome__icontains=search_term, status=True) |
+        Q(horas__contains=search_term))
+    elif search_type == 'ativos':
+        alunos = Aluno.objects.filter(Q(nome__icontains=search_term, status=False) |
+        Q(horas__contains=search_term))
+    else:
+        raise Http404()
+
+    return render(request, 'app_certificado/pages/aluno/lista_alunos.html', {
+        'page_title': f'Search for "{search_term}"',
+        'alunos': alunos,
+    })
+
+
+def search_certificados(request):
+    search_term = request.GET.get('q', '').strip()
+
+    if not search_term:
+        raise Http404()
+    
+    certificados = Certificado.objects.filter(
+        Q(nome__contains=search_term) |
+        Q(instituicao__contains=search_term) |
+        Q(duracao__contains=search_term) |
+        Q(categoria__contains=search_term),
+    ).order_by('-id')
+
+    return render(request, 'app_certificado/pages/certificado/lista_certificados.html', {
+        'page_title': f'Search for "{search_term}"',
+        'certificados': certificados,
+    })
+
+def search_usuarios(request):
+    search_term = request.GET.get('q', '').strip()
+
+    if not search_term:
+        raise Http404()
+    
+    usuarios = User.objects.filter(
+        Q(username__contains=search_term) | Q(email__contains=search_term)
+    ).order_by('-id')
+
+    return render(request, 'app_certificado/pages/user/user_list.html', {
+        'page_title': f'Search for "{search_term}"',
+        'users': usuarios,
+    })
+
+def search_templates(request):
+    search_term = request.GET.get('q', '').strip()
+
+    if not search_term:
+        raise Http404()
+    
+    templates = Template.objects.filter(
+        Q(instituicao__contains=search_term)
+    ).order_by('-id')
+
+    return render(request, 'app_certificado/pages/templateCertificado/lista_templates.html', {
+        'page_title': f'Search for "{search_term}"',
+        'templates': templates,
     })
 #-----------------------------------------------------------------------------------------------------------------------------------

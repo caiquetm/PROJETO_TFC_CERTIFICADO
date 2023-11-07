@@ -1,23 +1,35 @@
 {% extends "global/base.html" %}
 
-{% block title %}Lista de Usuários{% endblock title %}
+{% block title %} {{user.title}} {% endblock title %}
 
 {% block content %}
+{% include 'app_certificado/pages/user/search.html' %}
   <h1>Lista de Usuários</h1>
   <ul>
     <div class="users-dashboard-container">
     {% for user in users %}
       <li class="user-list-item">
         <div class="user-info">
-          <span class="user-name">{{ user.username }} - {{ user.email }}</span>
+          <span class="user-name">{{ user.username }} 
+            - {{ user.email }} 
+            - {% if user.is_staff %}
+            - Admin
+            {% else %}
+            - User
+            {% endif %} </span>
         </div>
         <div class="user-actions">
           <a href="{% url 'app_certificado:user_edit' user.id %}" class="edit-link">Editar</a>
-          <a href="{% url 'app_certificado:user_delete' user.id %}" class="inactivate-link">Excluir</a>
-        </div>
+          {% if user.is_active %}
+              <a href="{% url 'app_certificado:user_inactivate' user.id %}" class="inactivate-link">Inativar</a>
+          {% else %}
+              <a href="{% url 'app_certificado:user_activate' user.id %}" class="activate-link">Reativar</a>
+          {% endif %}
+      </div>
       </li>
     {% endfor %}
   </div>
-  </ul>
   <a href="{% url 'app_certificado:user_register' %}" class="add-link">Adicionar Usuário</a>
+  </ul>
+  
 {% endblock content %}

@@ -7,27 +7,30 @@
   <h1>Lista de Usuários</h1>
   <ul>
     <div class="users-dashboard-container">
-    {% for user in users %}
+      {% for user in users %}
       <li class="user-list-item">
         <div class="user-info">
-          <span class="user-name">{{ user.username }} 
-            - {{ user.email }} 
-            - {% if user.is_staff %}
-            - Admin
-            {% else %}
-            - User
-            {% endif %} </span>
+          <span class="user-name">{{ user.username }} - {{ user.email }} - {% if user.is_staff %}
+            Admin
+          {% else %}
+            User
+          {% endif %}</span>
         </div>
         <div class="user-actions">
           <a href="{% url 'app_certificado:user_edit' user.id %}" class="edit-link">Editar</a>
           {% if user.is_active %}
+            {% if user == request.user %}
+              <span class="inactivate-link disabled">Inativar (Usuário Atual)</span>
+            {% else %}
               <a href="{% url 'app_certificado:user_inactivate' user.id %}" class="inactivate-link">Inativar</a>
+            {% endif %}
           {% else %}
-              <a href="{% url 'app_certificado:user_activate' user.id %}" class="activate-link">Reativar</a>
+            <a href="{% url 'app_certificado:user_activate' user.id %}" class="activate-link">Reativar</a>
           {% endif %}
-      </div>
+        </div>
       </li>
     {% endfor %}
+    
   </div>
   <a href="{% url 'app_certificado:user_register' %}" class="add-link">Adicionar Usuário</a>
   </ul>

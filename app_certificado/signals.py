@@ -18,9 +18,11 @@ from app_certificado.models import Certificado
 @receiver(post_save, sender=Certificado)
 def update_aluno_horas(sender, instance, created, **kwargs):
     if created:
-        return  # Se for um novo vertificado ele pula
+        return  # Se for um novo certificado ele pula
     if instance.status == 1:
         instance.update_aluno_horas()
+
+
 
 @receiver(post_delete, sender=Certificado)
 def subtract_aluno_horas(sender, instance, **kwargs):

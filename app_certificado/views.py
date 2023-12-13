@@ -342,89 +342,254 @@ def enviar_certificado(request):
             # Verifica se a imagem foi carregada corretamente
             imagem = certificado.imagem
             if imagem:
-                # Carrega a imagem usando PIL
-                image = Image.open(imagem)
-                # Usa o pytesseract para extrair o texto da imagem
-                texto_extraido = pytesseract.image_to_string(image)
-                
+                try:
+                    # Carrega a imagem usando PIL
+                    image = Image.open(imagem)
+                    # Usa o pytesseract para extrair o texto da imagem
+                    texto_extraido = pytesseract.image_to_string(image)
+                    
 
-                #PROCURAR INSTITUIÇAO NA IMAGEM----------------------------------------------
-                match = re.search(r'Certificado(.*?)Certificamos', texto_extraido, re.DOTALL)
-                if match:
-                    instituicao_certificado = match.group(1).strip()
-                    certificado.instituicao = instituicao_certificado.upper()
-                else:
-                    match = re.search(r'(.*?)Certificamos', texto_extraido, re.DOTALL)
+                    #PROCURAR INSTITUIÇAO NA IMAGEM----------------------------------------------
+                    match = re.search(r'Certificado(.*?)Certificamos', texto_extraido, re.DOTALL)
                     if match:
                         instituicao_certificado = match.group(1).strip()
                         certificado.instituicao = instituicao_certificado.upper()
-                #------------------------------------------------------------------------------
+                    else:
+                        match = re.search(r'(.*?)Certificamos', texto_extraido, re.DOTALL)
+                        if match:
+                            instituicao_certificado = match.group(1).strip()
+                            certificado.instituicao = instituicao_certificado.upper()
+                    #------------------------------------------------------------------------------
 
-                #PROCURAR NOME DO ALUNO NA IMAGEM----------------------------------------------
-                match = re.search(r'Certificamos que(.*?)participou', texto_extraido, re.DOTALL)
-                if match:
-                    nome_certificado = match.group(1).strip()
-                    certificado.nome = nome_certificado.upper()
-                #------------------------------------------------------------------------------
+                    #PROCURAR NOME DO ALUNO NA IMAGEM----------------------------------------------
+                    match = re.search(r'Certificamos que(.*?)participou', texto_extraido, re.DOTALL)
+                    if match:
+                        nome_certificado = match.group(1).strip()
+                        certificado.nome = nome_certificado.upper()
+                    #------------------------------------------------------------------------------
 
-                #PROCURAR HORAS NA IMAGEM----------------------------------------------
-                match = re.search(r'total de (.*?)horas', texto_extraido, re.DOTALL)
-                if match:
-                    horas_certificado = match.group(1).strip()
-                    certificado.duracao = horas_certificado.upper()
-                #------------------------------------------------------------------------------
+                    #PROCURAR HORAS NA IMAGEM----------------------------------------------
+                    match = re.search(r'total de (.*?)horas', texto_extraido, re.DOTALL)
+                    if match:
+                        horas_certificado = match.group(1).strip()
+                        certificado.duracao = horas_certificado.upper()
+                    #------------------------------------------------------------------------------
 
-                #PROCURAR CATEGORIA NA IMAGEM----------------------------------------------
-                match = re.search(r'participou (.*?),', texto_extraido, re.DOTALL)
-                if match:
-                    categoria_certificado = match.group(1).strip()
-                    certificado.categoria = categoria_certificado.upper()
-                #------------------------------------------------------------------------------
+                    #PROCURAR CATEGORIA NA IMAGEM----------------------------------------------
+                    match = re.search(r'participou (.*?),', texto_extraido, re.DOTALL)
+                    if match:
+                        categoria_certificado = match.group(1).strip()
+                        certificado.categoria = categoria_certificado.upper()
+                    #------------------------------------------------------------------------------
+
+                    # Additional Validation Checks
+                    valid_phrases = ['Certificamos que']
+                    is_valid_certificate = all(phrase in texto_extraido for phrase in valid_phrases)
+                    print(f'certificado_data set in session: {valid_phrases}')
+                    print(f'certificado_data set in session: {texto_extraido}')
+                    print(f'certificado_data set in session: {is_valid_certificate}')
+
+                    confidence_threshold = 80  # Adjust as needed
+                    if image.info.get('dpi', (0, 0))[0] < confidence_threshold or not is_valid_certificate:
+                        messages.error(request, 'A imagem não atende aos critérios de validação.')
+                        return redirect('app_certificado:error_page')
+                    
+
+                    # Verifica se a palavra 'UNIRV' está no texto_extraido
+                    if 'UNIRV' in certificado.instituicao:
+                        try:
+                            template = Template.objects.get(instituicao__iexact='UNIRV')
+                            certificado.template = template
+                        except Template.DoesNotExist:
+                            print("Instituição 'UNIRV' não encontrada no banco de dados")   
+                            return redirect('app_certificado:novo_template')
+
+                    imagem_url = certificado.imagem.url if certificado.imagem else None
+                    # Save the certificado_data in the session
+                    certificado_data = {
+                            'instituicao': certificado.instituicao,
+                            'nome': certificado.nome,
+                            'duracao': certificado.duracao,
+                            'categoria': certificado.categoria,
+                            'imagem': imagem_url,
+                            'template': certificado.template.id if certificado.template else None,
+                        }
+                    request.session['certificado_data'] = certificado_data
+
+                        # Add this print statement to check if certificado_data is set correctly
+                    print(f'certificado_data set in session: {certificado_data}')
 
 
-                #linhas = texto_extraido.split('\n')
-                # certificado.nome = linhas[6].upper()
-                # certificado.instituicao = linhas[2]
-                # certificado.categoria = linhas[7]
 
-                # Verifica se a palavra 'UNIRV' está no texto_extraido
-                if 'UNIRV' in certificado.instituicao:
+
+
+                    # Buscar o aluno no banco de dados
                     try:
-                        template = Template.objects.get(instituicao__iexact='UNIRV')
-                        certificado.template = template
-                    except Template.DoesNotExist:
-                        print("Instituição 'UNIRV' não encontrada no banco de dados")   
-                # Buscar o aluno no banco de dados
-                try:
-                    aluno = Aluno.objects.get(nome=certificado.nome)
-                    certificado.aluno = aluno
-                except Aluno.DoesNotExist:
-                    #if is_admin:  # Verifique se o usuário é um administrador
+                        aluno = Aluno.objects.get(nome=certificado.nome)
+                        certificado.aluno = aluno
+                    except Aluno.DoesNotExist:
+                        print('Aluno não encontrado. Redirecionando para novo_aluno...')
                         return redirect('app_certificado:novo_aluno')
-                    #else:
-                        # message = "Aluno não encontrado. Entre em contato com o administrador."
-                            # Renderizar um template com a mensagem
-                        # return render(request, 'seu_template_de_mensagem.html', {'message': message})      
-                #certificado.categoria = texto_extraido
-                #certificado.save()
-                #return redirect('app_certificado:sucesso')  # Redireciona para a página de sucesso
-    
-            # Check if a similar certificate already exists in the database
-            existing_certificates = Certificado.objects.filter(
-                Q(nome=certificado.nome) & Q(instituicao=certificado.instituicao) & Q(duracao=certificado.duracao)
-            )
-            
-            if existing_certificates.exists():
-                # A similar certificate already exists, handle this case (e.g., show an error message)
-                messages.error(request, 'Um certificado semelhante já existe no banco de dados.')
-            else:
-                # Save the certificate if no similar certificate exists
-                certificado.save()
-                messages.success(request, 'Certificado salvo com sucesso.')
-                return redirect('app_certificado:sucesso')  # Redirect to the success page
+                    except Aluno.MultipleObjectsReturned:
+                        # Handle the case where multiple Aluno objects have the same name
+                        matching_alunos = Aluno.objects.filter(nome=certificado.nome)
+                        if matching_alunos.exists():
+                            # If there are matching alunos, let the user choose one
+                            print('Múltiplos alunos encontrados. Redirecionando para handle_multiple_alunos...')
+                            return handle_multiple_alunos(request, certificado, matching_alunos)
+                        
+                        # If no matching alunos, redirect to an error page or handle accordingly
+                        messages.error(request, 'Erro: Múltiplos alunos encontrados com o mesmo nome.')
+                        return redirect('app_certificado:error_page')  # Redirect to an error page
+
+
+                    existing_certificates = Certificado.objects.filter(
+                            Q(nome=certificado.nome) & Q(instituicao=certificado.instituicao) & Q(duracao=certificado.duracao)
+                    )
+                        
+                    if existing_certificates.exists():
+                            # A similar certificate already exists, handle this case (e.g., show an error message)
+                            messages.error(request, 'Um certificado semelhante já existe no banco de dados.')
+                    else:
+                            # Save the certificate if no similar certificate exists
+                            certificado.save()
+                            messages.success(request, 'Certificado salvo com sucesso.')
+                            return redirect('app_certificado:sucesso')  # Redirect to the success page
+                except Exception as e:
+                    # Handle exceptions during image processing or text extraction
+                    messages.error(request, f'Erro durante o processamento da imagem: {str(e)}')
+                    return redirect('app_certificado:error_page')
     else:
         form = CertificadoForm()
     return render(request, 'app_certificado/pages/certificado/enviar_certificado.html', {'form': form})
+
+
+def handle_multiple_alunos(request, certificado, alunos):
+    # Render a page to let the user choose from the list of matching alunos
+    return render(
+        request,
+        'app_certificado/pages/certificado/selecionar_aluno.html',
+        {'certificado': certificado, 'alunos': alunos}
+    )
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from .models import Aluno, Certificado
+from django.core.exceptions import ValidationError
+
+from django.shortcuts import render
+
+from django.shortcuts import redirect, render
+
+def selecionar_aluno(request):
+    certificado_data = request.session.get('certificado_data', {})
+
+    if not certificado_data:
+        messages.error(request, 'Certificado data not found in the session.')
+        return redirect('app_certificado:error_page')
+
+    if request.method == 'POST':
+        certificado_id = request.POST.get('certificado_id')
+        aluno_id = request.POST.get('aluno_id')
+
+        # Check if the provided aluno_id is valid
+        try:
+            aluno_id = int(aluno_id)
+            aluno = Aluno.objects.get(pk=aluno_id)
+        except (ValueError, Aluno.DoesNotExist):
+            messages.error(request, 'Aluno not found with the provided ID.')
+            return redirect('app_certificado:error_page')  # Redirect to an error page
+
+        # Check if the provided certificado_id is valid
+        try:
+            certificado_id = int(certificado_id)
+            certificado = Certificado.objects.get(pk=certificado_id)
+        except (ValueError, Certificado.DoesNotExist):
+            messages.error(request, 'Certificado not found with the provided ID.')
+            return redirect('app_certificado:error_page')  # Redirect to an error page
+
+        # Associate the aluno with the certificado
+        certificado.aluno = aluno
+
+        try:
+            # Save the certificado with the associated aluno
+            certificado.save()
+            messages.success(request, 'Aluno associado ao certificado com sucesso.')
+            return redirect('app_certificado:sucesso')  # Redirect to the success page
+        except Exception as e:
+            # Handle any unexpected errors during the save process
+            messages.error(request, f'Error associating aluno to certificado: {e}')
+            return redirect('app_certificado:error_page')  # Redirect to an error page
+
+    else:
+        # Handle the case where the request method is not POST
+        messages.error(request, 'Invalid request method. Expected POST.')
+
+        # If you need to redirect to 'handle_multiple_alunos', add the necessary logic here
+        return render(
+            request,
+            'app_certificado/pages/certificado/handle_multiple_alunos.html',
+            {'certificado_data': certificado_data}
+        )  # Render the page to let the user choose from the list of matching alunos
+
+
+
+from django.shortcuts import get_object_or_404
+
+def salvar_certificado(request):
+    if request.method == 'POST':
+        certificado_id = request.POST.get('certificado_id')
+        aluno_id = request.POST.get('aluno_id')
+        
+        # Retrieve the stored data from the session
+        certificado_data = request.session.get('certificado_data', {})
+        
+        print(f'certificado_id: {certificado_id}, aluno_id: {aluno_id}')
+        print(f'certificado_data: {certificado_data}')
+
+        # You may want to validate certificado_data here
+
+        certificado = Certificado()
+            
+        # Update Certificado fields
+        certificado.instituicao = certificado_data['instituicao']
+        certificado.nome = certificado_data['nome']
+        certificado.duracao = certificado_data['duracao']
+        certificado.categoria = certificado_data['categoria']
+        
+        template_id = certificado_data.get('template')
+        template = get_object_or_404(Template, pk=template_id)
+        certificado.template = template
+            
+        # Convert aluno_id to an integer
+        aluno_id = int(aluno_id)
+
+        # Associate the Aluno instance with the certificado
+        try:
+            aluno = get_object_or_404(Aluno, pk=aluno_id)
+        except Aluno.DoesNotExist:
+            messages.error(request, 'Aluno not found with the provided ID.')
+            return redirect('app_certificado:error_page')  # Redirect to an error page
+
+        certificado.aluno = aluno
+
+        # Save or update Certificado to the database
+        certificado.save()
+
+        return redirect('app_certificado:sucesso')  # Redirect to the success page
+
+    else:
+        messages.error(request, 'Invalid request method. Expected POST.')
+        return redirect('app_certificado:error_page')  # Redirect to an error page
+
+
+
+
+def error_page(request):
+    return render(request, 'app_certificado/pages/certificado/error_page.html')  # Adjust the template path as needed
+
+
 
 @login_required(login_url='app_certificado:login', redirect_field_name='next')
 def activate_certificado(request, certificado_id):

@@ -23,10 +23,14 @@ urlpatterns = [
     path('users/inactivate/<int:user_id>/', views.inactivate_user, name='user_inactivate'),
     path('users/activate/<int:user_id>/', views.activate_user, name='user_activate'),
 
-
+    #path('salvar_certificado/', views.salvar_certificado, name='salvar_certificado'),
+    path('selecionar-aluno/', views.selecionar_aluno, name='selecionar_aluno'),
+    path('salvar-certificado/', views.salvar_certificado, name='salvar_certificado'),
+    path('error-page/', views.error_page, name='error_page'),
     #path('', views.usuario, name="usuario"),
     path('certificados/<int:id>/', views.certificado, name="certificado"),
     path('certificados/aluno/<int:aluno_id>/',views.aluno, name="aluno"),
+    #path('certificados/processar-selecao-aluno/', views.processar_selecao_aluno, name='processar_selecao_aluno'),
     #path('certificados/template/<int:template_id>/', views.template, name="template"),
     #path('', views.alunos, name="alunos"),
 
@@ -45,6 +49,7 @@ urlpatterns = [
     path('sucesso/', views.sucesso, name="sucesso"),
     path('certificados/', views.lista_certificados, name="lista_certificados"),
     path('certificados/criar/', views.criar_certificado, name="criar_certificado"),
+    #path('certificados/criar_autom/<int:aluno_id>/', views.criar_certificado_autom, name="criar_certificado_autom"),
     path('certificados/<int:certificado_id>/', views.ver_certificado, name="ver_certificado"),
     path('certificados/<int:certificado_id>/atualizar/', views.atualizar_certificado, name="atualizar_certificado"),
     path('certificados/<int:certificado_id>/excluir/', views.excluir_certificado, name="excluir_certificado"),

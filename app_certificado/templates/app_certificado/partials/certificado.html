@@ -1,10 +1,9 @@
 <div class="certificado certificados-list-item">
   <div class="certificado-cover">
     <a href="{% url 'app_certificado:certificado' certificado.id %}">
-      <img src="{{ certificado.imagem.url }}" alt="Temporário">
+      <img src="{% if certificado.imagem %}{{ certificado.imagem.url }}{% endif %}" alt="Certificado de - {{ certificado.nome }}">
     </a>
   </div>
-
   <div class="certificado-title-container">
     <h1 class="certificado-title">
       <a href="{% url 'app_certificado:certificado' certificado.id %}">

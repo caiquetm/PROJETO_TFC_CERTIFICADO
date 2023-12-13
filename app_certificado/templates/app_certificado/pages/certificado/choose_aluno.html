@@ -1,0 +1,20 @@
+{% extends "global/base.html" %}
+
+{% block title %}Choose Aluno{% endblock title %}
+
+{% block content %}
+  <h2>Multiple alunos found with the same name</h2>
+  <p>Please choose one of the following alunos:</p>
+
+  <form method="post" action="{% url 'app_certificado:selecionar_aluno' %}">
+    {% csrf_token %}
+    
+    {% for aluno in matching_alunos %}
+      <input type="radio" name="aluno_id" value="{{ aluno.id }}" id="aluno_{{ aluno.id }}">
+      <label for="aluno_{{ aluno.id }}">{{ aluno.nome }}</label><br>
+    {% endfor %}
+    
+    <input type="hidden" name="certificado_id" value="{{ certificado.id }}">
+    <button type="submit">Choose Aluno</button>
+  </form>
+{% endblock content %}
